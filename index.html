@@ -7,10 +7,8 @@
   <style>
     :root{
       --bg:#0b1020;
-      --panel:rgba(255,255,255,0.06);
-      --stroke:rgba(255,255,255,0.14);
       --text:rgba(255,255,255,0.92);
-      --muted:rgba(255,255,255,0.68);
+      --muted:rgba(255,255,255,0.70);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -43,130 +41,119 @@
       padding: 10px 12px;
       border-radius: 999px;
       background: rgba(0,0,0,0.22);
-      border: 1px solid var(--stroke);
-      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(8px);
       box-shadow: 0 10px 30px rgba(0,0,0,0.25);
       font-weight: 900;
       letter-spacing: 0.2px;
-      font-size: 14px;
-      color: var(--muted);
-      min-width: 120px;
-      justify-content:center;
     }
     .iconBtn{
       pointer-events:auto;
-      width: 48px;
-      height: 48px;
-      border-radius: 16px;
-      border: 1px solid var(--stroke);
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
       background: rgba(0,0,0,0.22);
       display:flex;
       align-items:center;
       justify-content:center;
       cursor:pointer;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-      backdrop-filter: blur(10px);
-      transition: transform 0.08s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.22);
+      backdrop-filter: blur(8px);
     }
     .iconBtn:active{transform: translateY(1px) scale(0.99)}
-    .iconBtn svg{width: 22px; height: 22px; opacity:0.92}
 
     .stage{
-      height:100%;
+      position: fixed;
+      inset: 0;
       display:flex;
-      flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap: 16px;
-      padding: 60px 14px 24px 14px;
+      padding: 72px 16px 180px;
     }
 
-    .diceRow{
+    .cardWrap{
+      width: min(520px, 92vw);
       display:flex;
       align-items:center;
       justify-content:center;
-      gap: 18px;
-      min-height: 240px;
+      position:relative;
     }
-    .die{
-      width: min(220px, 40vw);
-      max-width: 240px;
+
+    img.diceCard{
+      width: min(520px, 92vw);
+      max-width: 520px;
       height: auto;
-      border-radius: 24px;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+      border-radius: 28px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.40);
       border: 1px solid rgba(255,255,255,0.10);
       background: rgba(255,255,255,0.03);
     }
 
     .cover{
-      width: min(520px, 92vw);
-      height: 260px;
-      border-radius: 28px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(11,16,32,0.88);
+      position:absolute;
+      inset: 0;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size: 70px;
-      font-weight: 900;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.35);
-      opacity:0;
+      font-size: 56px;
+      font-weight: 950;
+      letter-spacing: 0.6px;
+      background: rgba(11,16,32,0.88);
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.10);
+      opacity: 0;
       pointer-events:none;
-      transition: opacity 0.12s ease;
+      transition: opacity 120ms ease;
     }
     .cover.show{opacity:1}
 
-    .pad{
-      width: min(720px, 96vw);
-      display:grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      margin-top: 6px;
-    }
-    @media (max-width: 620px){
-      .pad{grid-template-columns: repeat(4, 1fr)}
-      .cover{height: 220px}
-      .diceRow{min-height: 210px}
-    }
-    .numBtn{
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      color: var(--text);
-      border-radius: 18px;
-      padding: 16px 0;
-      font-size: 26px;
-      font-weight: 950;
-      cursor:pointer;
-      box-shadow: 0 10px 26px rgba(0,0,0,0.22);
-      transition: transform 0.08s ease, background 0.18s ease, border-color 0.18s ease;
-    }
-    .numBtn:active{transform: translateY(1px) scale(0.99)}
-    .numBtn:hover{background: rgba(255,255,255,0.09)}
-    .numBtn.good{
-      border-color: rgba(46,229,157,0.80);
-      background: rgba(46,229,157,0.14);
-    }
-    .numBtn.bad{
-      border-color: rgba(255,92,122,0.80);
-      background: rgba(255,92,122,0.12);
-    }
-
     .bigPlay{
-      width: 110px;
-      height: 110px;
-      border-radius: 32px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.06);
+      position:absolute;
+      inset: 0;
       display:flex;
       align-items:center;
       justify-content:center;
+      border: none;
+      background: transparent;
       cursor:pointer;
-      box-shadow: 0 16px 46px rgba(0,0,0,0.32);
-      transition: transform 0.08s ease, background 0.18s ease;
+    }
+    .bigPlay svg{
+      width: 110px;
+      height: 110px;
+      filter: drop-shadow(0 14px 30px rgba(0,0,0,0.35));
     }
     .bigPlay:active{transform: translateY(1px) scale(0.99)}
-    .bigPlay:hover{background: rgba(255,255,255,0.10)}
-    .bigPlay svg{width: 44px; height: 44px}
+
+    .pad{
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+    @media (max-width: 560px){
+      .pad{grid-template-columns: repeat(4, 1fr)}
+    }
+    .numBtn{
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border-radius: 18px;
+      padding: 18px 0;
+      font-size: 28px;
+      font-weight: 950;
+      cursor:pointer;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.24);
+    }
+    .numBtn:active{transform: translateY(1px) scale(0.99)}
+    .numBtn.good{outline: 3px solid rgba(46,229,157,0.55)}
+    .numBtn.bad{outline: 3px solid rgba(255,92,122,0.55)}
+    .numBtn:disabled{opacity:0.75; cursor: default}
 
     .overlay{
       position: fixed;
@@ -174,171 +161,155 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      pointer-events:none;
+      background: rgba(0,0,0,0.25);
       opacity:0;
-      transition: opacity 0.14s ease;
-      z-index: 20;
+      pointer-events:none;
+      transition: opacity 140ms ease;
+      z-index: 9;
     }
-    .overlay.show{opacity:1}
+    .overlay.show{opacity:1; pointer-events:auto}
     .resultCard{
-      pointer-events:auto;
       width: min(520px, 92vw);
       border-radius: 28px;
-      background: rgba(0,0,0,0.32);
-      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.30);
+      border: 1px solid rgba(255,255,255,0.12);
       backdrop-filter: blur(10px);
-      box-shadow: 0 18px 60px rgba(0,0,0,0.40);
+      box-shadow: 0 22px 60px rgba(0,0,0,0.42);
       padding: 18px;
       display:flex;
-      flex-direction:column;
       align-items:center;
-      gap: 12px;
+      justify-content: space-between;
+      gap: 14px;
     }
-    .emoji{
-      font-size: 54px;
-      line-height: 1;
-    }
-    .bigNumber{
-      font-size: 86px;
-      font-weight: 1000;
-      letter-spacing: 0.5px;
-      margin-top: -6px;
-    }
-    .nextBtn{
-      width: 84px;
-      height: 84px;
-      border-radius: 26px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.08);
+    .face{
+      width: 64px;
+      height: 64px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
       display:flex;
       align-items:center;
       justify-content:center;
+      font-size: 36px;
+    }
+    .bigN{
+      font-size: 54px;
+      font-weight: 950;
+      letter-spacing: 0.4px;
+    }
+    .nextBtn{
+      width: 72px;
+      height: 72px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
       cursor:pointer;
-      transition: transform 0.08s ease, background 0.18s ease;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
     .nextBtn:active{transform: translateY(1px) scale(0.99)}
-    .nextBtn:hover{background: rgba(255,255,255,0.12)}
     .nextBtn svg{width: 34px; height: 34px}
-    .tiny{
-      font-size: 12px;
-      color: rgba(255,255,255,0.65);
-      margin-top: -2px;
-    }
 
     .settingsMask{
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.35);
-      opacity:0;
-      pointer-events:none;
-      transition: opacity 0.14s ease;
-      z-index: 30;
+      background: rgba(0,0,0,0.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 16px;
+      z-index: 20;
     }
-    .settingsMask.show{
-      opacity:1;
-      pointer-events:auto;
-    }
-    .settingsPanel{
-      position: absolute;
-      top: 70px;
-      right: 12px;
-      width: min(360px, 92vw);
-      border-radius: 22px;
-      background: rgba(0,0,0,0.38);
-      border: 1px solid rgba(255,255,255,0.14);
+    .settingsMask.show{display:flex}
+    .settings{
+      width: min(560px, 94vw);
+      border-radius: 26px;
+      background: rgba(0,0,0,0.40);
+      border: 1px solid rgba(255,255,255,0.12);
       backdrop-filter: blur(10px);
-      box-shadow: 0 18px 60px rgba(0,0,0,0.42);
-      padding: 14px;
-      display:flex;
-      flex-direction:column;
+      box-shadow: 0 22px 60px rgba(0,0,0,0.42);
+      padding: 16px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
-    .sRow{
+    @media (max-width: 560px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .field{
       display:flex;
       align-items:center;
       justify-content: space-between;
       gap: 10px;
-      padding: 10px;
-      border-radius: 16px;
+      padding: 12px 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.05);
     }
-    .sLabel{
-      font-weight: 900;
-      letter-spacing: 0.2px;
-      color: rgba(255,255,255,0.86);
-      font-size: 14px;
-    }
-    .numInput{
-      width: 118px;
+    .field span{color: var(--muted); font-weight: 900}
+    input[type="number"]{
+      width: 120px;
       padding: 10px 10px;
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,0.14);
       background: rgba(0,0,0,0.20);
-      color: rgba(255,255,255,0.92);
-      font-weight: 900;
-      font-size: 14px;
-      outline:none;
+      color: var(--text);
+      font-weight: 950;
+      font-size: 18px;
+      outline: none;
       text-align:center;
     }
     .toggles{
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 2px;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @media (max-width: 560px){
+      .toggles{grid-template-columns: 1fr}
     }
     .toggle{
       display:flex;
       align-items:center;
       justify-content: space-between;
-      gap: 10px;
-      padding: 10px;
-      border-radius: 16px;
+      padding: 12px 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.05);
       cursor:pointer;
+      font-weight: 950;
     }
-    .toggle span{
-      font-weight: 900;
-      font-size: 13px;
-      color: rgba(255,255,255,0.86);
-    }
-    .toggle input{
-      transform: scale(1.15);
-      accent-color: #9dbbff;
-    }
-    .saveRow{
+    .toggle input{transform: scale(1.25)}
+    .rowBtns{
       display:flex;
       gap: 10px;
-      margin-top: 4px;
+      margin-top: 12px;
     }
-    .sBtn{
+    .btn{
       flex:1;
       padding: 12px 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.92);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
       font-weight: 950;
       cursor:pointer;
-      transition: transform 0.08s ease, background 0.18s ease;
     }
-    .sBtn:active{transform: translateY(1px) scale(0.99)}
-    .sBtn:hover{background: rgba(255,255,255,0.10)}
-    .sBtn.primary{
-      background: rgba(46,229,157,0.14);
-      border-color: rgba(46,229,157,0.35);
-    }
-    .sBtn.primary:hover{background: rgba(46,229,157,0.20)}
+    .btn.primary{background: rgba(46,229,157,0.16)}
+    .btn:active{transform: translateY(1px) scale(0.99)}
     .warn{
       display:none;
-      padding: 10px;
-      border-radius: 16px;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 18px;
       background: rgba(255,92,122,0.12);
       border: 1px solid rgba(255,92,122,0.30);
-      font-size: 13px;
-      color: rgba(255,255,255,0.90);
-      line-height: 1.25;
+      font-weight: 950;
+      color: rgba(255,255,255,0.92);
     }
   </style>
 </head>
@@ -347,515 +318,431 @@
   <div class="hud">
     <div class="pill" id="scorePill">⭐ 0</div>
     <button class="iconBtn" id="gearBtn" aria-label="Instellingen">
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="3"></circle>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.33 1.82A2 2 0 1 1 10 22.6a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.82-.33A2 2 0 1 1 1.4 10a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .33-1.82l-.06-.06A2 2 0 1 1 5.5 4.7l.06.06A1.65 1.65 0 0 0 7 4.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .33-1.82A2 2 0 1 1 14 1.4a1.65 1.65 0 0 0 .6 1 1.65 1.65 0 0 0 1.82.33l.06-.06A2 2 0 1 1 19.3 5.5l-.06.06A1.65 1.65 0 0 0 19.4 7a1.65 1.65 0 0 0 .6 1 1.65 1.65 0 0 0 1.82.33A2 2 0 1 1 22.6 14a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.33 1.82z"></path>
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3.2"></circle>
+        <path d="M19.4 15a7.9 7.9 0 0 0 .1-2l2-1.2-2-3.4-2.3.6a7.5 7.5 0 0 0-1.7-1L13 2h-4l-.5 3a7.5 7.5 0 0 0-1.7 1L4.5 5.4 2.5 8.8l2 1.2a7.9 7.9 0 0 0 .1 2l-2 1.2 2 3.4 2.3-.6a7.5 7.5 0 0 0 1.7 1L9 22h4l.5-3a7.5 7.5 0 0 0 1.7-1l2.3.6 2-3.4-2-1.2Z"></path>
       </svg>
     </button>
   </div>
 
-  <main class="stage" aria-label="Speelveld">
-    <div class="diceRow" id="diceRow" aria-label="Dobbelstenen">
-      <img class="die" id="die1" alt="" style="display:none" />
-      <img class="die" id="die2" alt="" style="display:none" />
-    </div>
+  <div class="stage">
+    <div class="cardWrap">
+      <img class="diceCard" id="cardImg" alt="" />
+      <div class="cover show" id="cover">▶</div>
 
-    <div class="cover show" id="cover">▶</div>
-
-    <button class="bigPlay" id="startBtn" aria-label="Start">
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polygon points="9,7 19,12 9,17"></polygon>
-      </svg>
-    </button>
-
-    <div class="pad" id="pad" aria-label="Kies het aantal" style="display:none"></div>
-  </main>
-
-  <div class="overlay" id="overlay" aria-label="Resultaat">
-    <div class="resultCard">
-      <div class="emoji" id="emoji">🙂</div>
-      <div class="bigNumber" id="bigNumber">0</div>
-      <div class="tiny"> </div>
-      <button class="nextBtn" id="nextBtn" aria-label="Verder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polyline points="9 18 15 12 9 6"></polyline>
+      <button class="bigPlay" id="startBtn" aria-label="Start">
+        <svg viewBox="0 0 24 24" fill="white" aria-hidden="true">
+          <path d="M8 5v14l12-7z"></path>
         </svg>
       </button>
     </div>
   </div>
 
-  <div class="settingsMask" id="settingsMask" aria-label="Instellingen">
-    <div class="settingsPanel" role="dialog" aria-modal="true" aria-label="Instellingen">
-      <div class="warn" id="warnBox"></div>
+  <div class="pad" id="pad" style="display:none"></div>
 
-      <div class="sRow">
-        <div class="sLabel">Min totaal</div>
-        <input class="numInput" id="minTotal" type="number" min="1" max="20" value="1" />
+  <div class="overlay" id="overlay">
+    <div class="resultCard">
+      <div class="face" id="emoji">🙂</div>
+      <div class="bigN" id="bigNumber">0</div>
+      <button class="nextBtn" id="nextBtn" aria-label="Volgende">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 18l6-6-6-6"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="settingsMask" id="settingsMask" aria-hidden="true">
+    <div class="settings" role="dialog" aria-label="Instellingen">
+      <div class="grid">
+        <div class="field">
+          <span>min</span>
+          <input id="minTotal" type="number" min="1" max="10" value="1" />
+        </div>
+        <div class="field">
+          <span>max</span>
+          <input id="maxTotal" type="number" min="1" max="10" value="10" />
+        </div>
+        <div class="field">
+          <span>flits</span>
+          <input id="flashMs" type="number" min="200" max="2500" value="900" />
+        </div>
+        <div class="field">
+          <span>ms</span>
+          <div style="width:120px;text-align:center;font-weight:950;color:var(--muted)"> </div>
+        </div>
       </div>
 
-      <div class="sRow">
-        <div class="sLabel">Max totaal</div>
-        <input class="numInput" id="maxTotal" type="number" min="1" max="20" value="10" />
-      </div>
-
-      <div class="sRow">
-        <div class="sLabel">Flits ms</div>
-        <input class="numInput" id="flashMs" type="number" min="200" max="2500" value="900" />
-      </div>
-
-      <div class="toggles" aria-label="1 meer 2 meer gelijk">
+      <div class="toggles" aria-label="Stapjes">
+        <label class="toggle"><span>gelijk</span><input id="step0" type="checkbox" checked /></label>
         <label class="toggle"><span>1 meer</span><input id="step1" type="checkbox" checked /></label>
         <label class="toggle"><span>2 meer</span><input id="step2" type="checkbox" checked /></label>
-        <label class="toggle"><span>Gelijk</span><input id="step0" type="checkbox" checked /></label>
       </div>
 
-      <div class="toggles" aria-label="Volgorde">
-        <label class="toggle"><span>Grootste links</span><input id="bigLeft" type="checkbox" checked /></label>
-        <label class="toggle"><span>Grootste rechts</span><input id="bigRight" type="checkbox" checked /></label>
+      <div class="toggles" style="grid-template-columns: 1fr 1fr; margin-top:10px" aria-label="Volgorde">
+        <label class="toggle"><span>grootste eerst</span><input id="bigFirst" type="checkbox" checked /></label>
+        <label class="toggle"><span>grootste achteraan</span><input id="bigBack" type="checkbox" checked /></label>
       </div>
 
-      <div class="saveRow">
-        <button class="sBtn" id="resetBtn">Score 0</button>
-        <button class="sBtn primary" id="saveBtn">Opslaan</button>
+      <div class="warn" id="warnBox"></div>
+
+      <div class="rowBtns">
+        <button class="btn" id="resetBtn">reset</button>
+        <button class="btn primary" id="saveBtn">ok</button>
       </div>
     </div>
   </div>
 
-<script>
-  const ASSETS = {
-    1: ["dice_assets/dobbelsteen01a.png"],
-    2: ["dice_assets/dobbelsteen02a.png","dice_assets/dobbelsteen02b.png"],
-    3: ["dice_assets/dobbelsteen03a.png","dice_assets/dobbelsteen03b.png","dice_assets/dobbelsteen03c.png"],
-    4: ["dice_assets/dobbelsteen04a.png","dice_assets/dobbelsteen04b.png","dice_assets/dobbelsteen04c.png","dice_assets/dobbelsteen04d.png"],
-    5: ["dice_assets/dobbelsteen05a.png","dice_assets/dobbelsteen05b.png","dice_assets/dobbelsteen05c.png","dice_assets/dobbelsteen05d.png","dice_assets/dobbelsteen05e.png"],
-    6: ["dice_assets/dobbelsteen06a.png","dice_assets/dobbelsteen06b.png","dice_assets/dobbelsteen06c.png","dice_assets/dobbelsteen06d.png","dice_assets/dobbelsteen06e.png","dice_assets/dobbelsteen06f.png"],
-    7: ["dice_assets/dobbelsteen07a.png","dice_assets/dobbelsteen07b.png","dice_assets/dobbelsteen07c.png","dice_assets/dobbelsteen07d.png"],
-    8: ["dice_assets/dobbelsteen08a.png","dice_assets/dobbelsteen08b.png","dice_assets/dobbelsteen08c.png"],
-    9: ["dice_assets/dobbelsteen09a.png","dice_assets/dobbelsteen09b.png"],
-    10:["dice_assets/dobbelsteen10.png"]
-  };
+  <script>
+    const CARDS = {"1": [{"src": "dice_assets/dobbelsteen01a.png", "left": 1, "right": 0, "diceCount": 1}], "2": [{"src": "dice_assets/dobbelsteen02a.png", "left": 2, "right": 0, "diceCount": 1}, {"src": "dice_assets/dobbelsteen02b.png", "left": 1, "right": 1, "diceCount": 2}], "3": [{"src": "dice_assets/dobbelsteen03a.png", "left": 3, "right": 0, "diceCount": 1}, {"src": "dice_assets/dobbelsteen03b.png", "left": 1, "right": 2, "diceCount": 2}, {"src": "dice_assets/dobbelsteen03c.png", "left": 2, "right": 1, "diceCount": 2}], "4": [{"src": "dice_assets/dobbelsteen04a.png", "left": 4, "right": 0, "diceCount": 1}, {"src": "dice_assets/dobbelsteen04b.png", "left": 1, "right": 3, "diceCount": 2}, {"src": "dice_assets/dobbelsteen04c.png", "left": 2, "right": 2, "diceCount": 2}, {"src": "dice_assets/dobbelsteen04d.png", "left": 3, "right": 1, "diceCount": 2}], "5": [{"src": "dice_assets/dobbelsteen05a.png", "left": 5, "right": 0, "diceCount": 1}, {"src": "dice_assets/dobbelsteen05b.png", "left": 1, "right": 4, "diceCount": 2}, {"src": "dice_assets/dobbelsteen05c.png", "left": 2, "right": 3, "diceCount": 2}, {"src": "dice_assets/dobbelsteen05d.png", "left": 3, "right": 2, "diceCount": 2}, {"src": "dice_assets/dobbelsteen05e.png", "left": 4, "right": 1, "diceCount": 2}], "6": [{"src": "dice_assets/dobbelsteen06a.png", "left": 6, "right": 0, "diceCount": 1}, {"src": "dice_assets/dobbelsteen06b.png", "left": 1, "right": 5, "diceCount": 2}, {"src": "dice_assets/dobbelsteen06c.png", "left": 2, "right": 4, "diceCount": 2}, {"src": "dice_assets/dobbelsteen06d.png", "left": 3, "right": 3, "diceCount": 2}, {"src": "dice_assets/dobbelsteen06e.png", "left": 4, "right": 2, "diceCount": 2}, {"src": "dice_assets/dobbelsteen06f.png", "left": 5, "right": 1, "diceCount": 2}], "7": [{"src": "dice_assets/dobbelsteen07a.png", "left": 1, "right": 6, "diceCount": 2}, {"src": "dice_assets/dobbelsteen07b.png", "left": 2, "right": 5, "diceCount": 2}, {"src": "dice_assets/dobbelsteen07c.png", "left": 5, "right": 2, "diceCount": 2}, {"src": "dice_assets/dobbelsteen07d.png", "left": 6, "right": 1, "diceCount": 2}], "8": [{"src": "dice_assets/dobbelsteen08a.png", "left": 2, "right": 6, "diceCount": 2}, {"src": "dice_assets/dobbelsteen08b.png", "left": 4, "right": 4, "diceCount": 2}, {"src": "dice_assets/dobbelsteen08c.png", "left": 6, "right": 2, "diceCount": 2}], "9": [{"src": "dice_assets/dobbelsteen09a.png", "left": 4, "right": 5, "diceCount": 2}, {"src": "dice_assets/dobbelsteen09b.png", "left": 5, "right": 4, "diceCount": 2}], "10": [{"src": "dice_assets/dobbelsteen10.png", "left": 5, "right": 5, "diceCount": 2}]};
 
-  const el = (id) => document.getElementById(id);
+    const el = (id) => document.getElementById(id);
 
-  const die1 = el("die1");
-  const die2 = el("die2");
-  const diceRow = el("diceRow");
-  const cover = el("cover");
-  const startBtn = el("startBtn");
-  const pad = el("pad");
+    const cardImg = el("cardImg");
+    const cover = el("cover");
+    const startBtn = el("startBtn");
+    const pad = el("pad");
 
-  const overlay = el("overlay");
-  const emoji = el("emoji");
-  const bigNumber = el("bigNumber");
-  const nextBtn = el("nextBtn");
+    const overlay = el("overlay");
+    const emoji = el("emoji");
+    const bigNumber = el("bigNumber");
+    const nextBtn = el("nextBtn");
 
-  const scorePill = el("scorePill");
+    const scorePill = el("scorePill");
 
-  const gearBtn = el("gearBtn");
-  const settingsMask = el("settingsMask");
-  const warnBox = el("warnBox");
+    const gearBtn = el("gearBtn");
+    const settingsMask = el("settingsMask");
+    const warnBox = el("warnBox");
 
-  const minTotalEl = el("minTotal");
-  const maxTotalEl = el("maxTotal");
-  const flashMsEl = el("flashMs");
-  const step0El = el("step0");
-  const step1El = el("step1");
-  const step2El = el("step2");
-  const bigLeftEl = el("bigLeft");
-  const bigRightEl = el("bigRight");
-  const saveBtn = el("saveBtn");
-  const resetBtn = el("resetBtn");
+    const minTotalEl = el("minTotal");
+    const maxTotalEl = el("maxTotal");
+    const flashMsEl = el("flashMs");
+    const step0El = el("step0");
+    const step1El = el("step1");
+    const step2El = el("step2");
+    const bigFirstEl = el("bigFirst");
+    const bigBackEl = el("bigBack");
+    const saveBtn = el("saveBtn");
+    const resetBtn = el("resetBtn");
 
-  const STORAGE_KEY = "subiteer_dobbelspel_v1";
+    const STORAGE_KEY = "subiteer_dobbelspel_v2";
 
-  const state = {
-    settings: {
-      minTotal: 1,
-      maxTotal: 10,
-      flashMs: 900,
-      steps: [0,1,2],
-      bigLeft: true,
-      bigRight: true
-    },
-    score: 0,
-    prevTotal: null,
-    targetTotal: null,
-    targetDice: [],
-    phase: "idle",
-    audio: null
-  };
+    const state = {
+      settings: {
+        minTotal: 1,
+        maxTotal: 10,
+        flashMs: 900,
+        steps: [0,1,2],
+        bigFirst: true,
+        bigBack: true
+      },
+      score: 0,
+      prevTotal: null,
+      targetTotal: null,
+      targetCard: null,
+      phase: "idle",
+      audio: null
+    };
 
-  function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
-  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
-  function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+    function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+    function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
-  function clampInt(v, min, max){
-    const n = Number.parseInt(v, 10);
-    if (Number.isNaN(n)) return min;
-    return Math.max(min, Math.min(max, n));
-  }
+    function clampInt(v, min, max){
+      const n = Number.parseInt(v, 10);
+      if (Number.isNaN(n)) return min;
+      return Math.max(min, Math.min(max, n));
+    }
 
-  function setWarn(msg){
-    warnBox.textContent = msg;
-    warnBox.style.display = "block";
-  }
-  function clearWarn(){
-    warnBox.style.display = "none";
-  }
+    function setWarn(msg){
+      warnBox.textContent = msg;
+      warnBox.style.display = "block";
+    }
+    function clearWarn(){ warnBox.style.display = "none"; }
 
-  function loadSettings(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const data = JSON.parse(raw);
-      if (data && typeof data === "object"){
+    function loadSettings(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (!data || typeof data !== "object") return;
+
+        const minTotal = clampInt(data.minTotal ?? 1, 1, 10);
+        const maxTotal = clampInt(data.maxTotal ?? 10, 1, 10);
+        const flashMs = clampInt(data.flashMs ?? 900, 200, 2500);
+        const steps = Array.isArray(data.steps) ? data.steps.filter(x => [0,1,2].includes(x)) : [0,1,2];
+
         state.settings = {
-          minTotal: clampInt(data.minTotal ?? 1, 1, 20),
-          maxTotal: clampInt(data.maxTotal ?? 10, 1, 20),
-          flashMs: clampInt(data.flashMs ?? 900, 200, 2500),
-          steps: Array.isArray(data.steps) ? data.steps.filter(x => [0,1,2].includes(x)) : [0,1,2],
-          bigLeft: !!data.bigLeft,
-          bigRight: !!data.bigRight
+          minTotal,
+          maxTotal,
+          flashMs,
+          steps: steps.length ? steps : [0,1,2],
+          bigFirst: !!data.bigFirst,
+          bigBack: !!data.bigBack
         };
-        if (state.settings.steps.length === 0) state.settings.steps = [0,1,2];
+      } catch(e){}
+    }
+
+    function syncUIFromSettings(){
+      minTotalEl.value = state.settings.minTotal;
+      maxTotalEl.value = state.settings.maxTotal;
+      flashMsEl.value = state.settings.flashMs;
+      step0El.checked = state.settings.steps.includes(0);
+      step1El.checked = state.settings.steps.includes(1);
+      step2El.checked = state.settings.steps.includes(2);
+      bigFirstEl.checked = state.settings.bigFirst;
+      bigBackEl.checked = state.settings.bigBack;
+    }
+
+    function readSettingsFromUI(){
+      const minTotal = clampInt(minTotalEl.value, 1, 10);
+      const maxTotal = clampInt(maxTotalEl.value, 1, 10);
+      const flashMs = clampInt(flashMsEl.value, 200, 2500);
+
+      const steps = [];
+      if (step0El.checked) steps.push(0);
+      if (step1El.checked) steps.push(1);
+      if (step2El.checked) steps.push(2);
+
+      state.settings = {
+        minTotal, maxTotal, flashMs,
+        steps,
+        bigFirst: !!bigFirstEl.checked,
+        bigBack: !!bigBackEl.checked
+      };
+    }
+
+    function validateSettings(){
+      const s = state.settings;
+      if (s.minTotal > s.maxTotal){ setWarn("min groter dan max"); return false; }
+      if (!s.steps.length){ setWarn("kies stapjes"); return false; }
+      clearWarn();
+      return true;
+    }
+
+    function saveSettings(){
+      readSettingsFromUI();
+      if (!validateSettings()) return false;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.settings));
+      return true;
+    }
+
+    function updateScoreUI(){
+      scorePill.textContent = `⭐ ${state.score}`;
+    }
+
+    function openSettings(){
+      syncUIFromSettings();
+      settingsMask.classList.add("show");
+    }
+    function closeSettings(){
+      settingsMask.classList.remove("show");
+      clearWarn();
+    }
+
+    function ensureAudio(){
+      if (state.audio) return;
+      try{ state.audio = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch(e){ state.audio = null; }
+    }
+    function beep(ok){
+      ensureAudio();
+      const ctx = state.audio;
+      if (!ctx) return;
+
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+
+      o.type = "sine";
+      o.frequency.value = ok ? 740 : 240;
+
+      g.gain.value = 0.0001;
+      o.connect(g);
+      g.connect(ctx.destination);
+
+      const now = ctx.currentTime;
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.11, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+
+      o.start(now);
+      o.stop(now + 0.2);
+    }
+
+    function decideNextTotal(){
+      const s = state.settings;
+
+      if (state.prevTotal === null){
+        return randInt(s.minTotal, s.maxTotal);
       }
-    } catch(e){}
-  }
 
-  function syncUIFromSettings(){
-    minTotalEl.value = state.settings.minTotal;
-    maxTotalEl.value = state.settings.maxTotal;
-    flashMsEl.value = state.settings.flashMs;
-    step0El.checked = state.settings.steps.includes(0);
-    step1El.checked = state.settings.steps.includes(1);
-    step2El.checked = state.settings.steps.includes(2);
-    bigLeftEl.checked = state.settings.bigLeft;
-    bigRightEl.checked = state.settings.bigRight;
-  }
+      for (let i = 0; i < 30; i++){
+        const step = pick(s.steps);
+        const next = state.prevTotal + step;
+        if (next >= s.minTotal && next <= s.maxTotal) return next;
+      }
 
-  function readSettingsFromUI(){
-    const minTotal = clampInt(minTotalEl.value, 1, 20);
-    const maxTotal = clampInt(maxTotalEl.value, 1, 20);
-    const flashMs = clampInt(flashMsEl.value, 200, 2500);
-
-    const steps = [];
-    if (step0El.checked) steps.push(0);
-    if (step1El.checked) steps.push(1);
-    if (step2El.checked) steps.push(2);
-
-    const bigLeft = !!bigLeftEl.checked;
-    const bigRight = !!bigRightEl.checked;
-
-    state.settings = { minTotal, maxTotal, flashMs, steps, bigLeft, bigRight };
-  }
-
-  function saveSettings(){
-    readSettingsFromUI();
-    if (!validateSettings()) return false;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.settings));
-    return true;
-  }
-
-  function validateSettings(){
-    const s = state.settings;
-
-    if (s.minTotal > s.maxTotal){
-      setWarn("Min is groter dan max");
-      return false;
-    }
-    if (s.steps.length === 0){
-      setWarn("Kies 1, 2 of gelijk");
-      return false;
-    }
-
-    const maxFace = 10;
-    const minTotalPossible = 1;
-    const maxTotalPossible = 2 * maxFace;
-
-    if (s.minTotal < minTotalPossible || s.maxTotal > maxTotalPossible){
-      setWarn("Totaal kan van 1 tot 20");
-      return false;
-    }
-
-    clearWarn();
-    return true;
-  }
-
-  function updateScoreUI(){
-    scorePill.textContent = `⭐ ${state.score}`;
-  }
-
-  function openSettings(){
-    syncUIFromSettings();
-    settingsMask.classList.add("show");
-  }
-  function closeSettings(){
-    settingsMask.classList.remove("show");
-    clearWarn();
-  }
-
-  function ensureAudio(){
-    if (state.audio) return;
-    try{
-      state.audio = new (window.AudioContext || window.webkitAudioContext)();
-    } catch(e){
-      state.audio = null;
-    }
-  }
-  function beep(ok){
-    ensureAudio();
-    const ctx = state.audio;
-    if (!ctx) return;
-
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-
-    o.type = "sine";
-    o.frequency.value = ok ? 740 : 240;
-
-    g.gain.value = 0.0001;
-
-    o.connect(g);
-    g.connect(ctx.destination);
-
-    const now = ctx.currentTime;
-    g.gain.setValueAtTime(0.0001, now);
-    g.gain.exponentialRampToValueAtTime(0.10, now + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
-
-    o.start(now);
-    o.stop(now + 0.2);
-  }
-
-  function pickDieImage(value){
-    const options = ASSETS[value];
-    return pick(options);
-  }
-
-  function decideNextTotal(){
-    const s = state.settings;
-
-    if (state.prevTotal === null){
-      return randInt(s.minTotal, s.maxTotal);
-    }
-
-    // Probeer een stap die binnen bereik past
-    for (let i = 0; i < 20; i++){
+      const maxStep = Math.max(...s.steps);
+      const upper = Math.max(s.minTotal, s.maxTotal - maxStep);
+      const base = randInt(s.minTotal, upper);
       const step = pick(s.steps);
-      const next = state.prevTotal + step;
-      if (next >= s.minTotal && next <= s.maxTotal){
-        return next;
+      return Math.min(s.maxTotal, base + step);
+    }
+
+    function pickCardForTotal(total){
+      const s = state.settings;
+      const options = (CARDS[String(total)] || []);
+      if (!options.length) return null;
+
+      const wantFirst = s.bigFirst;
+      const wantBack = s.bigBack;
+
+      let filtered = options;
+
+      if (wantFirst !== wantBack){
+        filtered = options.filter(o => {
+          if (o.diceCount !== 2 || o.left === o.right) return true;
+          if (wantFirst) return o.left > o.right;
+          return o.right > o.left;
+        });
+        if (!filtered.length) filtered = options;
+      }
+
+      return pick(filtered);
+    }
+
+    function buildPad(){
+      pad.innerHTML = "";
+      const s = state.settings;
+
+      for (let n = s.minTotal; n <= s.maxTotal; n++){
+        const btn = document.createElement("button");
+        btn.className = "numBtn";
+        btn.textContent = n;
+        btn.addEventListener("click", () => submitAnswer(n, btn));
+        pad.appendChild(btn);
       }
     }
 
-    // Geen stap past, kies een nieuw startpunt
-    const maxStep = Math.max(...s.steps);
-    const upper = Math.max(s.minTotal, s.maxTotal - maxStep);
-    const base = randInt(s.minTotal, upper);
-    const step = pick(s.steps);
-    return Math.min(s.maxTotal, base + step);
-  }
-
-  function makeDiceForTotal(total){
-    const maxFace = 10;
-
-    let count = 1;
-
-    // 1 dobbelsteen kan alleen van 1 tot 10
-    if (total > maxFace) count = 2;
-
-    // Voor 2 tot 10: soms 1, soms 2
-    if (total >= 2 && total <= maxFace){
-      count = Math.random() < 0.55 ? 1 : 2;
+    function setCover(on, symbol){
+      cover.textContent = symbol ?? " ";
+      cover.classList.toggle("show", !!on);
     }
 
-    if (count === 1){
-      return [total];
+    function showOverlay(show){
+      overlay.classList.toggle("show", !!show);
     }
 
-    // 2 dobbelstenen
-    const aMin = Math.max(1, total - maxFace);
-    const aMax = Math.min(maxFace, total - 1);
-    let a = randInt(aMin, aMax);
-    let b = total - a;
+    function lockPad(){
+      pad.querySelectorAll("button").forEach(b => b.disabled = true);
+    }
 
-    // Ordening grootste links of rechts
-    if (a !== b){
-      const big = Math.max(a,b);
-      const small = Math.min(a,b);
+    async function startRound(){
+      if (!validateSettings()) return;
 
-      const wantLeft = state.settings.bigLeft;
-      const wantRight = state.settings.bigRight;
+      state.phase = "flashing";
+      startBtn.style.display = "none";
+      pad.style.display = "none";
+      showOverlay(false);
 
-      let bigOnLeft = true;
+      const total = decideNextTotal();
+      state.targetTotal = total;
+      state.targetCard = pickCardForTotal(total);
 
-      if (wantLeft && wantRight){
-        bigOnLeft = Math.random() < 0.5;
-      } else if (wantLeft){
-        bigOnLeft = true;
-      } else if (wantRight){
-        bigOnLeft = false;
+      if (state.targetCard){
+        cardImg.src = state.targetCard.src;
+      }
+
+      setCover(true, " ");
+      await sleep(140);
+
+      setCover(false, " ");
+      await sleep(state.settings.flashMs);
+
+      setCover(true, "❓");
+
+      buildPad();
+      pad.style.display = "grid";
+      state.phase = "answering";
+    }
+
+    function submitAnswer(n, btn){
+      if (state.phase !== "answering") return;
+      state.phase = "result";
+      lockPad();
+
+      const ok = (n === state.targetTotal);
+      btn.classList.add(ok ? "good" : "bad");
+
+      if (ok){
+        state.score += 1;
+        emoji.textContent = "😄";
+        bigNumber.textContent = String(n);
+        beep(true);
       } else {
-        bigOnLeft = Math.random() < 0.5;
+        emoji.textContent = "😕";
+        bigNumber.textContent = String(state.targetTotal);
+        beep(false);
       }
 
-      if (bigOnLeft){
-        a = big; b = small;
-      } else {
-        a = small; b = big;
+      state.prevTotal = state.targetTotal;
+      updateScoreUI();
+      showOverlay(true);
+    }
+
+    function nextRound(){
+      showOverlay(false);
+      startRound();
+    }
+
+    startBtn.addEventListener("click", startRound);
+    nextBtn.addEventListener("click", nextRound);
+
+    gearBtn.addEventListener("click", () => {
+      if (settingsMask.classList.contains("show")) closeSettings();
+      else openSettings();
+    });
+
+    settingsMask.addEventListener("click", (e) => {
+      if (e.target === settingsMask) closeSettings();
+    });
+
+    saveBtn.addEventListener("click", () => {
+      const ok = saveSettings();
+      if (!ok) return;
+      buildPad();
+      closeSettings();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      state.score = 0;
+      state.prevTotal = null;
+      updateScoreUI();
+      closeSettings();
+      startBtn.style.display = "flex";
+      pad.style.display = "none";
+      setCover(true, "▶");
+      showOverlay(false);
+      state.phase = "idle";
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeSettings();
+      if (e.key === " "){
+        e.preventDefault();
+        if (overlay.classList.contains("show")) nextRound();
+        else if (state.phase === "idle") startRound();
       }
-    } else {
-      // gelijk, kleine variatie
-      if (Math.random() < 0.5){
-        const t = a; a = b; b = t;
-      }
-    }
+    });
 
-    return [a,b];
-  }
-
-  function buildPad(){
-    pad.innerHTML = "";
-    const s = state.settings;
-
-    for (let n = s.minTotal; n <= s.maxTotal; n++){
-      const btn = document.createElement("button");
-      btn.className = "numBtn";
-      btn.textContent = n;
-      btn.setAttribute("data-n", String(n));
-      btn.addEventListener("click", () => submitAnswer(n, btn));
-      pad.appendChild(btn);
-    }
-  }
-
-  function showDice(values){
-    const imgs = values.map(v => pickDieImage(v));
-
-    if (values.length === 1){
-      die1.src = imgs[0];
-      die1.style.display = "block";
-      die2.style.display = "none";
-    } else {
-      die1.src = imgs[0];
-      die2.src = imgs[1];
-      die1.style.display = "block";
-      die2.style.display = "block";
-    }
-  }
-
-  function setCover(on, symbol){
-    cover.textContent = symbol ?? " ";
-    cover.classList.toggle("show", !!on);
-  }
-
-  function showOverlay(show){
-    overlay.classList.toggle("show", !!show);
-    overlay.style.pointerEvents = show ? "auto" : "none";
-  }
-
-  async function startRound(){
-    if (!validateSettings()) return;
-
-    state.phase = "flashing";
-    startBtn.style.display = "none";
-    pad.style.display = "none";
-    showOverlay(false);
-
-    const total = decideNextTotal();
-    state.targetTotal = total;
-    state.targetDice = makeDiceForTotal(total);
-
-    setCover(true, " ");
-    showDice(state.targetDice);
-
-    // even ademhalen
-    await sleep(120);
-
-    // flits
-    setCover(false);
-    await sleep(state.settings.flashMs);
-
-    // weg, nu kiezen
-    setCover(true, "❓");
-    buildPad();
-    pad.style.display = "grid";
-    state.phase = "answering";
-  }
-
-  function lockPad(){
-    pad.querySelectorAll("button").forEach(b => b.disabled = true);
-  }
-
-  function submitAnswer(n, btn){
-    if (state.phase !== "answering") return;
-    state.phase = "result";
-    lockPad();
-
-    const ok = (n === state.targetTotal);
-    btn.classList.add(ok ? "good" : "bad");
-
-    if (ok){
-      state.score += 1;
-      emoji.textContent = "😄";
-      bigNumber.textContent = String(n);
-      beep(true);
-    } else {
-      emoji.textContent = "😕";
-      bigNumber.textContent = String(state.targetTotal);
-      beep(false);
-    }
-
-    state.prevTotal = state.targetTotal;
+    // Init
+    loadSettings();
+    syncUIFromSettings();
+    validateSettings();
     updateScoreUI();
-    showOverlay(true);
-  }
 
-  function nextRound(){
-    showOverlay(false);
-    startRound();
-  }
-
-  // Events
-  startBtn.addEventListener("click", startRound);
-  nextBtn.addEventListener("click", nextRound);
-
-  gearBtn.addEventListener("click", () => {
-    if (settingsMask.classList.contains("show")) closeSettings();
-    else openSettings();
-  });
-
-  settingsMask.addEventListener("click", (e) => {
-    if (e.target === settingsMask) closeSettings();
-  });
-
-  saveBtn.addEventListener("click", () => {
-    const ok = saveSettings();
-    if (!ok) return;
-    buildPad();
-    closeSettings();
-  });
-
-  resetBtn.addEventListener("click", () => {
-    state.score = 0;
-    state.prevTotal = null;
-    updateScoreUI();
-    closeSettings();
-  });
-
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeSettings();
-    if (e.key === " "){
-      e.preventDefault();
-      if (overlay.classList.contains("show")) nextRound();
-      else if (state.phase === "idle") startRound();
-    }
-  });
-
-  // Init
-  loadSettings();
-  syncUIFromSettings();
-  validateSettings();
-  updateScoreUI();
-</script>
+    cardImg.src = pickCardForTotal(6)?.src || (CARDS["6"]?.[0]?.src ?? "");
+    setCover(true, "▶");
+  </script>
 </body>
 </html>
