@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Dobbelstenen flits</title>
+<style>
+  :root {
+    --bg1: #6a11cb;
+    --bg2: #2575fc;
+    --card: rgba(255,255,255,0.12);
+    --card2: rgba(255,255,255,0.18);
+    --text: rgba(255,255,255,0.95);
+    --muted: rgba(255,255,255,0.75);
+    --shadow: 0 18px 45px rgba(0,0,0,0.25);
+    --radius: 22px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    color: var(--text);
+    background: radial-gradient(1200px 700px at 10% 10%, rgba(255,255,255,0.25), transparent 60%),
+                radial-gradient(900px 600px at 90% 30%, rgba(255,255,255,0.18), transparent 55%),
+                radial-gradient(800px 650px at 40% 95%, rgba(255,255,255,0.16), transparent 60%),
+                linear-gradient(135deg, var(--bg1), var(--bg2));
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,0,0,0.22);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+    z-index: 10;
+  }
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.14);
+  }
+  .pill.compact {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+  .pill label {
+    font-size: 12px;
+    letter-spacing: 0.2px;
+    color: var(--muted);
+  }
+  .pill input[type="number"] {
+    width: 54px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(0,0,0,0.20);
+    color: var(--text);
+    font-weight: 650;
+    font-size: 14px;
+    outline: none;
+  }
+  .pill input[type="range"] {
+    width: 150px;
+  }
+  .seg {
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.20);
+    border: 1px solid rgba(255,255,255,0.14);
+  }
+  .seg button {
+    border: 0;
+    color: var(--text);
+    background: transparent;
+    padding: 7px 10px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 13px;
+    opacity: 0.85;
+  }
+  .seg button.active {
+    background: rgba(255,255,255,0.18);
+    opacity: 1;
+  }
+  .iconbtn {
+    border: 0;
+    border-radius: 14px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.16);
+    color: var(--text);
+    font-weight: 900;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.16);
+  }
+  .iconbtn:active { transform: translateY(1px); }
+  .spacer { flex: 1; }
+  .tiny {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 650;
+  }
+  .hidebar {
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: 18px;
+    padding: 6px 8px;
+    border-radius: 12px;
+    opacity: 0.9;
+  }
+  .hidebar:active { transform: translateY(1px); }
+
+  .stage {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    padding-top: 64px;
+    display: grid;
+    place-items: center;
+  }
+  .card {
+    width: min(720px, 92vw);
+    height: min(520px, 70vh);
+    border-radius: var(--radius);
+    background: rgba(0,0,0,0.20);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+  .frame {
+    width: 86%;
+    height: 76%;
+    border-radius: 18px;
+    background: #000;
+    border: 1px solid rgba(255,255,255,0.14);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: auto;
+    opacity: 1;
+    transition: opacity 120ms ease;
+  }
+  .frame img.hidden {
+    opacity: 0;
+  }
+
+  .mask {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms ease;
+  }
+  .mask.visible {
+    opacity: 1;
+  }
+
+  .pad {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 18px;
+    width: min(680px, 92%);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+  }
+  .pad.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .num {
+    border: 0;
+    border-radius: 18px;
+    padding: 14px 10px;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: var(--text);
+    font-size: 26px;
+    font-weight: 950;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.20);
+  }
+  .num:active { transform: translateY(2px) scale(0.99); }
+
+  .centerFeedback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+  }
+  .centerFeedback.visible {
+    opacity: 1;
+  }
+  .result {
+    display: grid;
+    place-items: center;
+    gap: 10px;
+    padding: 18px 20px;
+    border-radius: 26px;
+    background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow: 0 18px 45px rgba(0,0,0,0.22);
+    min-width: 220px;
+  }
+  .result .emoji {
+    font-size: 56px;
+    line-height: 1;
+    animation: pop 340ms ease;
+  }
+  .result .big {
+    font-size: 64px;
+    font-weight: 1000;
+    letter-spacing: 0.5px;
+    min-height: 70px;
+  }
+  @keyframes pop {
+    from { transform: scale(0.7); opacity: 0.0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .bottombar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 14px 14px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    z-index: 9;
+    pointer-events: none;
+  }
+  .bottombar button {
+    pointer-events: auto;
+  }
+
+  #prevBtn { display: none; }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 18px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: var(--text);
+    font-weight: 750;
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity 180ms ease;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  .topbar.minimized {
+    transform: translateY(-74%);
+    transition: transform 200ms ease;
+  }
+  .topbar {
+    transition: transform 200ms ease;
+  }
+
+  @media (max-width: 720px) {
+    .pill label { display: none; }
+    .pill input[type="range"] { width: 120px; }
+    .seg button { padding: 7px 9px; }
+    .pad { gap: 8px; }
+    .num { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+  <div class="topbar" id="topbar">
+    <button class="hidebar" id="toggleBar" title="Balk verbergen of tonen">⬆️</button>
+
+    <div class="pill compact" title="Minimum totale stippen">
+      <label>min</label>
+      <input id="minTotal" type="number" min="1" max="12" value="1"/>
+    </div>
+
+    <div class="pill compact" title="Maximum totale stippen">
+      <label>max</label>
+      <input id="maxTotal" type="number" min="1" max="12" value="10"/>
+    </div>
+
+    <div class="pill" title="Filter">
+      <label>filter</label>
+      <div class="seg" id="filterSeg">
+        <button data-filter="all" class="active" title="Alles">✨</button>
+        <button data-filter="diff1" title="1 meer">+1</button>
+        <button data-filter="diff2" title="2 meer">+2</button>
+        <button data-filter="equal" title="Gelijken">=</button>
+        <button data-filter="first" title="Eerste grootste">1&gt;2</button>
+        <button data-filter="second" title="Tweede grootste">2&gt;1</button>
+      </div>
+    </div>
+
+    <div class="pill" title="Flitstijd">
+      <label>flits</label>
+      <input id="flashMs" type="range" min="150" max="2200" step="50" value="800"/>
+      <div class="tiny" id="flashLabel">800</div>
+    </div>
+
+    <button class="iconbtn" id="soundBtn" title="Geluid">🔊</button>
+    <button class="iconbtn" id="padBtn" title="Knoppen">🔢</button>
+
+    <div class="spacer"></div>
+    <div class="tiny" id="countLabel"> </div>
+    <button class="iconbtn" id="startBtn" title="Start of herstart">▶️</button>
+  </div>
+
+  <div class="stage">
+    <div class="card" id="card">
+      <div class="frame">
+        <img id="diceImg" alt="dobbelstenen"/>
+        <div class="mask" id="mask"></div>
+      </div>
+
+      <div class="centerFeedback" id="feedback">
+        <div class="result">
+          <div class="emoji" id="emoji"> </div>
+          <div class="big" id="bigNumber"> </div>
+        </div>
+      </div>
+
+      <div class="pad" id="pad"></div>
+    </div>
+  </div>
+
+  <div class="bottombar">
+    <button class="iconbtn" id="prevBtn" title="Vorige">⬅️</button>
+    <button class="iconbtn" id="revealBtn" title="Nog een keer laten zien">👀</button>
+    <button class="iconbtn" id="nextBtn" title="Volgende">➡️</button>
+    <button class="iconbtn" id="fsBtn" title="Volledig scherm">⛶</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const ALL_ITEMS = [{"src": "assets/images/dobbelsteen01a.png", "total": 1, "nDice": 1, "d1": 1, "d2": null, "name": "dobbelsteen01a.png"}, {"src": "assets/images/dobbelsteen02a.png", "total": 2, "nDice": 1, "d1": 2, "d2": null, "name": "dobbelsteen02a.png"}, {"src": "assets/images/dobbelsteen02b.png", "total": 2, "nDice": 2, "d1": 1, "d2": 1, "name": "dobbelsteen02b.png"}, {"src": "assets/images/dobbelsteen03a.png", "total": 3, "nDice": 1, "d1": 3, "d2": null, "name": "dobbelsteen03a.png"}, {"src": "assets/images/dobbelsteen03b.png", "total": 3, "nDice": 2, "d1": 1, "d2": 2, "name": "dobbelsteen03b.png"}, {"src": "assets/images/dobbelsteen03c.png", "total": 3, "nDice": 2, "d1": 2, "d2": 1, "name": "dobbelsteen03c.png"}, {"src": "assets/images/dobbelsteen04a.png", "total": 4, "nDice": 1, "d1": 4, "d2": null, "name": "dobbelsteen04a.png"}, {"src": "assets/images/dobbelsteen04b.png", "total": 4, "nDice": 2, "d1": 1, "d2": 3, "name": "dobbelsteen04b.png"}, {"src": "assets/images/dobbelsteen04c.png", "total": 4, "nDice": 2, "d1": 2, "d2": 2, "name": "dobbelsteen04c.png"}, {"src": "assets/images/dobbelsteen04d.png", "total": 4, "nDice": 2, "d1": 3, "d2": 1, "name": "dobbelsteen04d.png"}, {"src": "assets/images/dobbelsteen05a.png", "total": 5, "nDice": 1, "d1": 5, "d2": null, "name": "dobbelsteen05a.png"}, {"src": "assets/images/dobbelsteen05b.png", "total": 5, "nDice": 2, "d1": 1, "d2": 4, "name": "dobbelsteen05b.png"}, {"src": "assets/images/dobbelsteen05c.png", "total": 5, "nDice": 2, "d1": 2, "d2": 3, "name": "dobbelsteen05c.png"}, {"src": "assets/images/dobbelsteen05d.png", "total": 5, "nDice": 2, "d1": 3, "d2": 2, "name": "dobbelsteen05d.png"}, {"src": "assets/images/dobbelsteen05e.png", "total": 5, "nDice": 2, "d1": 4, "d2": 1, "name": "dobbelsteen05e.png"}, {"src": "assets/images/dobbelsteen06a.png", "total": 6, "nDice": 1, "d1": 6, "d2": null, "name": "dobbelsteen06a.png"}, {"src": "assets/images/dobbelsteen06b.png", "total": 6, "nDice": 2, "d1": 1, "d2": 5, "name": "dobbelsteen06b.png"}, {"src": "assets/images/dobbelsteen06c.png", "total": 6, "nDice": 2, "d1": 2, "d2": 4, "name": "dobbelsteen06c.png"}, {"src": "assets/images/dobbelsteen06d.png", "total": 6, "nDice": 2, "d1": 3, "d2": 3, "name": "dobbelsteen06d.png"}, {"src": "assets/images/dobbelsteen06e.png", "total": 6, "nDice": 2, "d1": 4, "d2": 2, "name": "dobbelsteen06e.png"}, {"src": "assets/images/dobbelsteen06f.png", "total": 6, "nDice": 2, "d1": 5, "d2": 1, "name": "dobbelsteen06f.png"}, {"src": "assets/images/dobbelsteen07a.png", "total": 7, "nDice": 2, "d1": 1, "d2": 6, "name": "dobbelsteen07a.png"}, {"src": "assets/images/dobbelsteen07b.png", "total": 7, "nDice": 2, "d1": 2, "d2": 5, "name": "dobbelsteen07b.png"}, {"src": "assets/images/dobbelsteen07c.png", "total": 7, "nDice": 2, "d1": 5, "d2": 2, "name": "dobbelsteen07c.png"}, {"src": "assets/images/dobbelsteen07d.png", "total": 7, "nDice": 2, "d1": 6, "d2": 1, "name": "dobbelsteen07d.png"}, {"src": "assets/images/dobbelsteen08a.png", "total": 8, "nDice": 2, "d1": 2, "d2": 6, "name": "dobbelsteen08a.png"}, {"src": "assets/images/dobbelsteen08b.png", "total": 8, "nDice": 2, "d1": 4, "d2": 4, "name": "dobbelsteen08b.png"}, {"src": "assets/images/dobbelsteen08c.png", "total": 8, "nDice": 2, "d1": 6, "d2": 2, "name": "dobbelsteen08c.png"}, {"src": "assets/images/dobbelsteen09a.png", "total": 9, "nDice": 2, "d1": 4, "d2": 5, "name": "dobbelsteen09a.png"}, {"src": "assets/images/dobbelsteen09b.png", "total": 9, "nDice": 2, "d1": 5, "d2": 4, "name": "dobbelsteen09b.png"}, {"src": "assets/images/dobbelsteen10.png", "total": 10, "nDice": 2, "d1": 5, "d2": 5, "name": "dobbelsteen10.png"}];
+const MAX_BUTTON_HARD = 12;
+
+const els = {
+  topbar: document.getElementById("topbar"),
+  toggleBar: document.getElementById("toggleBar"),
+  minTotal: document.getElementById("minTotal"),
+  maxTotal: document.getElementById("maxTotal"),
+  flashMs: document.getElementById("flashMs"),
+  flashLabel: document.getElementById("flashLabel"),
+  filterSeg: document.getElementById("filterSeg"),
+  soundBtn: document.getElementById("soundBtn"),
+  padBtn: document.getElementById("padBtn"),
+  startBtn: document.getElementById("startBtn"),
+  diceImg: document.getElementById("diceImg"),
+  mask: document.getElementById("mask"),
+  pad: document.getElementById("pad"),
+  feedback: document.getElementById("feedback"),
+  emoji: document.getElementById("emoji"),
+  bigNumber: document.getElementById("bigNumber"),
+  toast: document.getElementById("toast"),
+  countLabel: document.getElementById("countLabel"),
+  prevBtn: document.getElementById("prevBtn"),
+  nextBtn: document.getElementById("nextBtn"),
+  revealBtn: document.getElementById("revealBtn"),
+  fsBtn: document.getElementById("fsBtn"),
+  card: document.getElementById("card"),
+};
+
+let settings = {
+  minTotal: 1,
+  maxTotal: 10,
+  filter: "all",
+  flashMs: 800,
+  sound: true,
+  keypad: true,
+};
+
+let pools = { byTotal: new Map(), totals: [], nItems: 0 };
+let totalBag = [];
+let itemBags = new Map();
+
+let currentItem = null;
+let lastTotalShown = null;
+let lastSrcShown = null;
+
+let state = "idle"; // idle, flashing, answering, feedback
+let flashTimer = null;
+let transTimer = null;
+
+let audioCtx = null;
+let preloaded = new Map();
+
+function clamp(n, a, b) {
+  return Math.max(a, Math.min(b, n));
+}
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function toast(msg) {
+  els.toast.textContent = msg;
+  els.toast.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => els.toast.classList.remove("show"), 1200);
+}
+
+function ensureAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+function beep(kind="ok") {
+  if (!settings.sound) return;
+  ensureAudio();
+  const ctx = audioCtx;
+  const t0 = ctx.currentTime + 0.01;
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = "sine";
+  o.frequency.value = kind === "ok" ? 660 : 220;
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.12, t0 + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.18);
+  o.connect(g);
+  g.connect(ctx.destination);
+  o.start(t0);
+  o.stop(t0 + 0.2);
+}
+
+function setMasked(on) {
+  els.mask.classList.toggle("visible", on);
+  els.diceImg.classList.toggle("hidden", on);
+}
+
+function clearTimers() {
+  clearTimeout(flashTimer);
+  clearTimeout(transTimer);
+  flashTimer = null;
+  transTimer = null;
+}
+
+function applyFilters() {
+  const minT = settings.minTotal;
+  const maxT = settings.maxTotal;
+  const f = settings.filter;
+
+  let out = ALL_ITEMS.filter(it => it.total >= minT && it.total <= maxT);
+
+  if (f === "diff1") {
+    out = out.filter(it => it.nDice === 2 && Math.abs(it.d1 - it.d2) === 1);
+  } else if (f === "diff2") {
+    out = out.filter(it => it.nDice === 2 && Math.abs(it.d1 - it.d2) === 2);
+  } else if (f === "equal") {
+    out = out.filter(it => it.nDice === 2 && it.d1 === it.d2);
+  } else if (f === "first") {
+    out = out.filter(it => it.nDice === 2 && it.d1 > it.d2);
+  } else if (f === "second") {
+    out = out.filter(it => it.nDice === 2 && it.d2 > it.d1);
+  }
+  return out;
+}
+
+function buildPools(filtered) {
+  const byTotal = new Map();
+  filtered.forEach(it => {
+    const t = it.total;
+    if (!byTotal.has(t)) byTotal.set(t, []);
+    byTotal.get(t).push(it);
+  });
+  const totals = Array.from(byTotal.keys()).sort((a,b) => a - b);
+  return { byTotal, totals, nItems: filtered.length };
+}
+
+function preload(items) {
+  items.forEach(it => {
+    if (preloaded.has(it.src)) return;
+    const img = new Image();
+    img.src = it.src;
+    preloaded.set(it.src, img);
+  });
+}
+
+function buildPad() {
+  els.pad.innerHTML = "";
+  const maxBtn = clamp(settings.maxTotal, 1, MAX_BUTTON_HARD);
+  for (let n = 1; n <= maxBtn; n++) {
+    const b = document.createElement("button");
+    b.className = "num";
+    b.textContent = n;
+    b.addEventListener("click", () => onAnswer(n));
+    els.pad.appendChild(b);
+  }
+}
+
+function setActiveFilterButton() {
+  const btns = Array.from(els.filterSeg.querySelectorAll("button"));
+  btns.forEach(b => b.classList.toggle("active", b.dataset.filter === settings.filter));
+}
+
+function updateCountLabel() {
+  const out = applyFilters();
+  els.countLabel.textContent = out.length ? `${out.length}` : "0";
+}
+
+function readSettingsFromUI() {
+  let minT = parseInt(els.minTotal.value || "1", 10);
+  let maxT = parseInt(els.maxTotal.value || "10", 10);
+  minT = clamp(minT, 1, 12);
+  maxT = clamp(maxT, 1, 12);
+  if (minT > maxT) {
+    [minT, maxT] = [maxT, minT];
+  }
+  settings.minTotal = minT;
+  settings.maxTotal = maxT;
+  els.minTotal.value = minT;
+  els.maxTotal.value = maxT;
+
+  settings.flashMs = clamp(parseInt(els.flashMs.value || "800", 10), 150, 2200);
+  els.flashLabel.textContent = settings.flashMs;
+
+  buildPad();
+  updateCountLabel();
+}
+
+function resetRoundVisuals() {
+  els.feedback.classList.remove("visible");
+  els.pad.classList.remove("visible");
+  els.emoji.textContent = "";
+  els.bigNumber.textContent = "";
+}
+
+function showImage(it) {
+  els.diceImg.src = it ? it.src : "";
+}
+
+function pickNextItem() {
+  if (!pools.totals.length) return null;
+
+  if (totalBag.length === 0) {
+    totalBag = shuffle([...pools.totals]);
+    if (lastTotalShown !== null && totalBag.length > 1 && totalBag[0] === lastTotalShown) {
+      const j = totalBag.findIndex(t => t !== lastTotalShown);
+      if (j > 0) [totalBag[0], totalBag[j]] = [totalBag[j], totalBag[0]];
+    }
+  }
+
+  const t = totalBag.shift();
+
+  let bag = itemBags.get(t);
+  if (!bag || bag.length === 0) {
+    bag = shuffle([...pools.byTotal.get(t)]);
+    itemBags.set(t, bag);
+  }
+
+  if (bag.length > 1 && lastSrcShown && bag[0].src === lastSrcShown) {
+    const j = bag.findIndex(it => it.src !== lastSrcShown);
+    if (j > 0) [bag[0], bag[j]] = [bag[j], bag[0]];
+  }
+
+  const it = bag.shift();
+  lastTotalShown = t;
+  lastSrcShown = it.src;
+  return it;
+}
+
+function flashItem(it) {
+  if (!it) return;
+  clearTimers();
+  resetRoundVisuals();
+  currentItem = it;
+
+  showImage(it);
+  setMasked(false);
+
+  state = "flashing";
+  flashTimer = setTimeout(() => {
+    state = "answering";
+    setMasked(true);
+    if (settings.keypad) els.pad.classList.add("visible");
+  }, settings.flashMs);
+}
+
+function startGame() {
+  readSettingsFromUI();
+
+  const filtered = applyFilters();
+  pools = buildPools(filtered);
+
+  totalBag = [];
+  itemBags = new Map();
+  preload(filtered);
+
+  if (!filtered.length) {
+    clearTimers();
+    resetRoundVisuals();
+    currentItem = null;
+    showImage(null);
+    setMasked(true);
+    toast("geen plaatjes");
+    state = "idle";
+    return;
+  }
+
+  const first = pickNextItem();
+  flashItem(first);
+}
+
+function startNext() {
+  const next = pickNextItem();
+  if (!next) {
+    toast("geen plaatjes");
+    return;
+  }
+  flashItem(next);
+}
+
+function onAnswer(n) {
+  if (state !== "answering" || !currentItem) return;
+
+  state = "feedback";
+  els.pad.classList.remove("visible");
+
+  const ok = n === currentItem.total;
+  els.feedback.classList.add("visible");
+  els.emoji.textContent = ok ? "😄" : "🙈";
+  els.bigNumber.textContent = ok ? currentItem.total : "";
+
+  beep(ok ? "ok" : "no");
+
+  clearTimeout(transTimer);
+
+  if (ok) {
+    transTimer = setTimeout(() => {
+      els.feedback.classList.remove("visible");
+      setMasked(false);
+      transTimer = setTimeout(() => {
+        startNext();
+      }, 450);
+    }, 650);
+  } else {
+    transTimer = setTimeout(() => {
+      els.feedback.classList.remove("visible");
+      flashItem(currentItem);
+    }, 650);
+  }
+}
+
+function revealOnce() {
+  if (!currentItem) return;
+  flashItem(currentItem);
+}
+
+async function toggleFullscreen() {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    } else {
+      await document.exitFullscreen();
+    }
+  } catch (e) {
+    // negeren
+  }
+}
+
+function wireUI() {
+  buildPad();
+  updateCountLabel();
+  setActiveFilterButton();
+  readSettingsFromUI();
+
+  els.toggleBar.addEventListener("click", () => {
+    const minimized = els.topbar.classList.toggle("minimized");
+    els.toggleBar.textContent = minimized ? "⬇️" : "⬆️";
+  });
+
+  function autoRestart() {
+    startGame();
+  }
+
+  els.minTotal.addEventListener("change", autoRestart);
+  els.maxTotal.addEventListener("change", autoRestart);
+
+  els.flashMs.addEventListener("input", () => {
+    settings.flashMs = clamp(parseInt(els.flashMs.value || "800", 10), 150, 2200);
+    els.flashLabel.textContent = settings.flashMs;
+  });
+
+  els.filterSeg.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-filter]");
+    if (!btn) return;
+    settings.filter = btn.dataset.filter;
+    setActiveFilterButton();
+    autoRestart();
+  });
+
+  els.soundBtn.addEventListener("click", async () => {
+    settings.sound = !settings.sound;
+    els.soundBtn.textContent = settings.sound ? "🔊" : "🔇";
+    if (settings.sound) {
+      ensureAudio();
+      try { await audioCtx.resume(); } catch {}
+      beep("ok");
+    }
+  });
+
+  els.padBtn.addEventListener("click", () => {
+    settings.keypad = !settings.keypad;
+    els.padBtn.style.opacity = settings.keypad ? "1" : "0.6";
+    if (state === "answering") {
+      els.pad.classList.toggle("visible", settings.keypad);
+    }
+  });
+
+  els.startBtn.addEventListener("click", startGame);
+  els.nextBtn.addEventListener("click", startNext);
+  els.revealBtn.addEventListener("click", revealOnce);
+  els.fsBtn.addEventListener("click", toggleFullscreen);
+
+  // eerste beeld
+  const first = ALL_ITEMS[0];
+  if (first) {
+    showImage(first);
+    setMasked(false);
+  }
+}
+wireUI();
+</script>
+</body>
+</html>
