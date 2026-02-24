@@ -1,721 +1,1135 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>Dobbelstenen flits</title>
-<style>
-  :root {
-    --bg1: #6a11cb;
-    --bg2: #2575fc;
-    --glass: rgba(255,255,255,0.12);
-    --glass2: rgba(255,255,255,0.18);
-    --text: rgba(255,255,255,0.96);
-    --muted: rgba(255,255,255,0.78);
-    --shadow: 0 18px 45px rgba(0,0,0,0.25);
-    --radius: 22px;
-    --topbar-h: 72px;
-  }
-
-  * { box-sizing: border-box; }
-  html, body { height: 100%; }
-  body {
-    margin: 0;
-    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    color: var(--text);
-    background:
-      radial-gradient(900px 500px at 20% 10%, rgba(255,255,255,0.18), transparent 55%),
-      linear-gradient(135deg, var(--bg1), var(--bg2));
-    overflow-x: hidden;
-  }
-
-  .topbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: calc(10px + env(safe-area-inset-top)) 12px 10px 12px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-    z-index: 50;
-    backdrop-filter: blur(10px);
-    background: rgba(0,0,0,0.14);
-    border-bottom: 1px solid rgba(255,255,255,0.10);
-  }
-
-  .pill {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    padding: 8px 10px;
-    border-radius: 16px;
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.14);
-  }
-
-  .label {
-    font-size: 12px;
-    color: var(--muted);
-    letter-spacing: 0.02em;
-    user-select: none;
-  }
-
-  input[type="number"] {
-    width: 58px;
-    padding: 6px 8px;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.18);
-    background: rgba(0,0,0,0.18);
-    color: var(--text);
-    font-weight: 700;
-    outline: none;
-  }
-
-  input[type="range"] {
-    width: 160px;
-    accent-color: rgba(255,255,255,0.92);
-  }
-
-  .tiny {
-    font-size: 12px;
-    color: var(--muted);
-    min-width: 36px;
-    text-align: right;
-    user-select: none;
-  }
-
-  .tgroup {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-  }
-
-  .tbtn {
-    border: 0;
-    outline: none;
-    padding: 8px 10px;
-    border-radius: 14px;
-    cursor: pointer;
-    background: rgba(0,0,0,0.18);
-    color: rgba(255,255,255,0.92);
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
-    user-select: none;
-  }
-  .tbtn.active {
-    background: rgba(255,255,255,0.18);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.24);
-  }
-  .tbtn:active {
-    transform: translateY(1px);
-  }
-
-  .iconbtn {
-    border: 0;
-    outline: none;
-    width: 44px;
-    height: 40px;
-    border-radius: 14px;
-    cursor: pointer;
-    background: rgba(0,0,0,0.18);
-    color: rgba(255,255,255,0.92);
-    font-weight: 900;
-    display: grid;
-    place-items: center;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
-  }
-  .iconbtn.primary {
-    background: rgba(255,255,255,0.20);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22);
-  }
-
-  .wrap {
-    min-height: 100%;
-    padding-top: calc(var(--topbar-h) + 18px);
-    padding-bottom: calc(20px + env(safe-area-inset-bottom));
-    display: grid;
-    place-items: start center;
-  }
-
-  .panel {
-    width: min(980px, 94vw);
-    padding: 16px;
-    border-radius: var(--radius);
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.14);
-    box-shadow: var(--shadow);
-  }
-
-  .frame {
-    width: 100%;
-    height: min(52svh, 540px);
-    min-height: 260px;
-    border-radius: 18px;
-    background: #000;
-    border: 1px solid rgba(255,255,255,0.14);
-    overflow: hidden;
-    position: relative;
-  }
-
-  .stage {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(10px, 2.2vw, 22px);
-  }
-
-  #diceImg {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    display: block;
-  }
-  #diceImg.hidden {
-    opacity: 0;
-    visibility: hidden;
-  }
-
-  .mask {
-    position: absolute;
-    inset: 0;
-    background: #000;
-    opacity: 1;
-    pointer-events: none;
-    z-index: 3;
-    transition: opacity 140ms ease;
-  }
-  .mask.off {
-    opacity: 0;
-  }
-
-  .pad {
-    margin-top: 14px;
-    display: grid;
-    grid-template-columns: repeat(10, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  .nbtn {
-    border: 0;
-    outline: none;
-    border-radius: 16px;
-    padding: 14px 0;
-    font-size: 20px;
-    font-weight: 900;
-    cursor: pointer;
-    background: rgba(0,0,0,0.20);
-    color: rgba(255,255,255,0.94);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14);
-    user-select: none;
-  }
-  .nbtn:active {
-    transform: translateY(1px);
-  }
-  .nbtn.disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-  }
-
-  .feedback {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    z-index: 6;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 120ms ease;
-  }
-  .feedback.on {
-    opacity: 1;
-  }
-  .fbInner {
-    display: grid;
-    place-items: center;
-    gap: 10px;
-    padding: 18px 22px;
-    border-radius: 22px;
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(255,255,255,0.14);
-    backdrop-filter: blur(8px);
-  }
-  .emoji {
-    font-size: 52px;
-    line-height: 1;
-  }
-  .bign {
-    font-size: 52px;
-    font-weight: 950;
-    line-height: 1;
-  }
-
-  @media (max-width: 720px) {
-    input[type="range"] { width: 140px; }
-    .pad { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  }
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <title>Subiteer Spel</title>
+  <style>
+    :root {
+      --bg1:#0b1020;
+      --bg2:#1a2653;
+      --card:rgba(255,255,255,0.06);
+      --border:rgba(255,255,255,0.12);
+      --text:rgba(255,255,255,0.92);
+      --muted:rgba(255,255,255,0.70);
+      --ok:rgba(46,229,157,0.95);
+      --bad:rgba(255,92,122,0.95);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1100px 700px at 18% 10%, var(--bg2) 0%, var(--bg1) 58%) fixed;
+      color:var(--text);
+      overflow:hidden;
+      touch-action: manipulation;
+    }
+    .app{
+      height:100vh;
+      width:100vw;
+      display:grid;
+      grid-template-rows: 64px 1fr 280px;
+      gap: 10px;
+      padding: 12px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    @media (max-width: 600px){
+      .app{grid-template-rows: 56px 1fr 320px; padding: 10px}
+    }
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .badge{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid var(--border);
+      min-width: 140px;
+    }
+    .dot{
+      width:14px;height:14px;border-radius:999px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    .dot.ok{background: rgba(46,229,157,0.55); border-color: rgba(46,229,157,0.65)}
+    .dot.bad{background: rgba(255,92,122,0.55); border-color: rgba(255,92,122,0.65)}
+    .gearBtn{
+      width: 52px; height: 52px;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+    }
+    .gearBtn:active{transform: scale(0.98)}
+    .stage{
+      position:relative;
+      background: rgba(0,0,0,0.16);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    .mask{
+      position:absolute; inset:0;
+      background: rgba(11,16,32,0.88);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 56px;
+      font-weight: 900;
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity 120ms ease;
+    }
+    .mask.show{opacity:1}
+    .stim{
+      width:min(520px, 86vw);
+      height:min(320px, 34vh);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .stim img{max-width: 100%; max-height: 100%; object-fit: contain;}
+    .pad{
+      display:grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      align-content:start;
+      background: rgba(0,0,0,0.10);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 12px;
+    }
+    @media (max-width: 600px){
+      .pad{grid-template-columns: repeat(4, 1fr); gap: 10px}
+    }
+    .num{
+      height: 64px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 26px;
+      font-weight: 900;
+      cursor:pointer;
+      user-select:none;
+    }
+    .num:active{transform: scale(0.99)}
+    .num[aria-disabled="true"]{
+      opacity: 0.45;
+      pointer-events:none;
+    }
+    .flashEmoji{
+      position:absolute;
+      top: 12px;
+      right: 12px;
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 34px;
+      opacity:0;
+      transform: scale(0.95);
+      transition: opacity 140ms ease, transform 140ms ease;
+    }
+    .flashEmoji.show{opacity:1; transform: scale(1)}
+    .bigAnswer{
+      position:absolute;
+      left: 12px;
+      top: 12px;
+      min-width: 72px;
+      height: 64px;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 30px;
+      font-weight: 900;
+      opacity:0;
+      transform: translateY(-4px);
+      transition: opacity 140ms ease, transform 140ms ease;
+    }
+    .bigAnswer.show{opacity:1; transform: translateY(0)}
+    .modal{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,0.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 14px;
+    }
+    .modal.show{display:flex}
+    .panel{
+      width: min(860px, 98vw);
+      max-height: min(92vh, 860px);
+      overflow:auto;
+      background: rgba(12,18,38,0.98);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 22px;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      padding: 14px;
+    }
+    .panelTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding-bottom: 10px;
+    }
+    .xBtn{
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      font-size: 22px;
+      font-weight: 900;
+    }
+    .xBtn:active{transform: scale(0.99)}
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 760px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .card{
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 12px;
+    }
+    .row{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+      padding: 8px 0;
+      flex-wrap: wrap;
+    }
+    .mini{
+      font-size: 13px;
+      color: var(--muted);
+    }
+    input[type="number"]{
+      width: 120px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.18);
+      color: var(--text);
+      outline:none;
+      font-weight: 800;
+      font-size: 15px;
+    }
+    input[type="checkbox"]{transform: scale(1.2)}
+    .pillRow{
+      display:flex; flex-wrap: wrap; gap: 8px;
+      padding-top: 8px;
+    }
+    .pill{
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.18);
+      cursor:pointer;
+      user-select:none;
+      font-weight: 900;
+      min-width: 64px;
+      text-align:center;
+    }
+    .pill.on{background: rgba(46,229,157,0.14); border-color: rgba(46,229,157,0.26)}
+    .pill:active{transform: scale(0.99)}
+    .btnBig{
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(46,229,157,0.16);
+      padding: 12px 14px;
+      font-weight: 900;
+      cursor:pointer;
+      user-select:none;
+      font-size: 16px;
+    }
+    .btnBig:active{transform: scale(0.99)}
+    .btnGhost{
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      padding: 12px 14px;
+      font-weight: 900;
+      cursor:pointer;
+      user-select:none;
+      font-size: 16px;
+    }
+    .btnGhost:active{transform: scale(0.99)}
+  </style>
 </head>
 <body>
-  <div class="topbar" id="topbar">
-    <div class="pill">
-      <span class="label">min</span>
-      <input id="minTotal" type="number" value="1" min="0" max="20"/>
-      <span class="label">max</span>
-      <input id="maxTotal" type="number" value="10" min="0" max="20"/>
-    </div>
-
-    <div class="pill">
-      <span class="label">stenen</span>
-      <div class="tgroup" id="diceCountGroup">
-        <button class="tbtn active" data-c="1" title="1 dobbelsteen">1</button>
-        <button class="tbtn active" data-c="2" title="2 dobbelstenen">2</button>
+  <div class="app">
+    <div class="top">
+      <div class="badge" id="levelBadge" aria-label="niveau">
+        <div class="dot" id="s1"></div>
+        <div class="dot" id="s2"></div>
+        <div class="dot" id="s3"></div>
+        <div class="dot" id="s4"></div>
+        <div class="dot" id="s5"></div>
+      </div>
+      <div class="gearBtn" id="gearBtn" aria-label="instellingen">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="rgba(255,255,255,0.92)" stroke-width="2"/>
+          <path d="M19.4 15a7.9 7.9 0 0 0 .1-1l1.7-1.3-1.8-3.1-2 .7a7.6 7.6 0 0 0-1.7-1L15.4 6h-3.6l-.4 2.4a7.6 7.6 0 0 0-1.7 1l-2-.7-1.8 3.1L7.6 14a7.9 7.9 0 0 0 .1 1l-1.7 1.3 1.8 3.1 2-.7a7.6 7.6 0 0 0 1.7 1l.4 2.4h3.6l.4-2.4a7.6 7.6 0 0 0 1.7-1l2 .7 1.8-3.1L19.4 15Z" stroke="rgba(255,255,255,0.55)" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
       </div>
     </div>
 
-    <div class="pill">
-      <span class="label">mix</span>
-      <div class="tgroup" id="typeGroup">
-        <button class="tbtn" data-t="diff1" title="minstens één dobbelsteen is 1">+1</button>
-        <button class="tbtn" data-t="diff2" title="minstens één dobbelsteen is 2">+2</button>
-      </div>
+    <div class="stage" aria-label="flits">
+      <div class="stim" id="stim"></div>
+      <div class="mask" id="mask"></div>
+      <div class="flashEmoji" id="flashEmoji">🙂</div>
+      <div class="bigAnswer" id="bigAnswer">0</div>
     </div>
 
-    <div class="pill">
-      <span class="label">vergelijk</span>
-      <div class="tgroup" id="relGroup">
-        <button class="tbtn" data-r="equal" title="gelijken">=</button>
-        <button class="tbtn" data-r="first" title="eerste is groter">1&gt;2</button>
-        <button class="tbtn" data-r="second" title="tweede is groter">2&gt;1</button>
-      </div>
-    </div>
-
-    <div class="pill">
-      <span class="label">flits</span>
-      <input id="flashMs" type="range" min="150" max="2200" value="800" step="50"/>
-      <span class="tiny" id="flashLabel">800</span>
-    </div>
-
-    <button class="iconbtn primary" id="startBtn" title="start of pauze">▶</button>
-    <button class="iconbtn" id="fsBtn" title="volledig scherm">⛶</button>
+    <div class="pad" id="pad" aria-label="cijferknoppen"></div>
   </div>
 
-  <div class="wrap">
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
     <div class="panel">
-      <div class="frame">
-        <div class="stage">
-          <img id="diceImg" class="hidden" alt=""/>
-          <div class="mask" id="mask"></div>
-          <div class="feedback" id="feedback">
-            <div class="fbInner">
-              <div class="emoji" id="emoji"></div>
-              <div class="bign" id="bign"></div>
-            </div>
+      <div class="panelTop">
+        <div>
+          <div style="font-weight:900;font-size:18px">Instellingen</div>
+          <div class="mini">Voor de leerkracht</div>
+        </div>
+        <div class="xBtn" id="closeBtn" aria-label="sluiten">×</div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div style="font-weight:900">Niveaus</div>
+          <div class="mini">Kies een instapniveau, daarna kun je bijsturen</div>
+          <div class="pillRow" id="levelPills"></div>
+          <div class="row" style="padding-top:12px">
+            <button class="btnGhost" id="resetProgressBtn">Reset voortgang</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:900">Bereik</div>
+          <div class="mini">Totaal aantal stippen</div>
+
+          <div class="row">
+            <div>Min</div>
+            <input type="number" id="minTotal" min="1" max="20" value="1"/>
+          </div>
+          <div class="row">
+            <div>Max</div>
+            <input type="number" id="maxTotal" min="1" max="20" value="6"/>
+          </div>
+
+          <div class="row">
+            <div>Flits</div>
+            <input type="number" id="flashMs" min="250" max="2500" value="900"/>
+          </div>
+          <div class="mini">In milliseconden</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:900">Beelden</div>
+          <div class="mini">Kies wat je wilt oefenen</div>
+
+          <div class="row"><label style="display:flex;gap:10px;align-items:center"><input id="repDice" type="checkbox"/>Dobbelsteen</label></div>
+          <div class="row"><label style="display:flex;gap:10px;align-items:center"><input id="repTally" type="checkbox"/>Streepjes</label></div>
+          <div class="row"><label style="display:flex;gap:10px;align-items:center"><input id="repShapes" type="checkbox"/>Vormen</label></div>
+          <div class="row"><label style="display:flex;gap:10px;align-items:center"><input id="repFingers" type="checkbox"/>Vingers</label></div>
+          <div class="row"><label style="display:flex;gap:10px;align-items:center"><input id="repTen" type="checkbox"/>10 structuur</label></div>
+
+          <div class="mini" style="padding-top:6px">Dobbelsteen werkt hier tot en met 9, daarboven kiest het spel automatisch een ander beeld</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:900">Gedrag</div>
+          <div class="row"><label style="display:flex;gap:10px;align-items:center"><input id="autoNext" type="checkbox"/>Automatisch door</label></div>
+          <div class="row"><label style="display:flex;gap:10px;align-items:center"><input id="soundOn" type="checkbox"/>Geluid</label></div>
+          <div class="row"><label style="display:flex;gap:10px;align-items:center"><input id="autoLevel" type="checkbox"/>Automatisch niveau omhoog</label></div>
+          <div class="mini">Het spel herhaalt extra vaak wat nog lastig is</div>
+
+          <div class="row" style="padding-top:12px">
+            <button class="btnBig" id="applyBtn">Toepassen</button>
+          </div>
+          <div class="row">
+            <button class="btnGhost" id="startBtn">Start</button>
           </div>
         </div>
       </div>
-
-      <div class="pad" id="pad" aria-label="antwoorden"></div>
     </div>
   </div>
 
 <script>
-const RAW_ITEMS = [{"src": "assets/images/dobbelsteen01a.png", "total": 1, "nDice": 1, "d1": 1, "d2": null, "name": "dobbelsteen01a.png"}, {"src": "assets/images/dobbelsteen02a.png", "total": 2, "nDice": 1, "d1": 2, "d2": null, "name": "dobbelsteen02a.png"}, {"src": "assets/images/dobbelsteen02b.png", "total": 2, "nDice": 2, "d1": 1, "d2": 1, "name": "dobbelsteen02b.png"}, {"src": "assets/images/dobbelsteen03a.png", "total": 3, "nDice": 1, "d1": 3, "d2": null, "name": "dobbelsteen03a.png"}, {"src": "assets/images/dobbelsteen03b.png", "total": 3, "nDice": 2, "d1": 1, "d2": 2, "name": "dobbelsteen03b.png"}, {"src": "assets/images/dobbelsteen03c.png", "total": 3, "nDice": 2, "d1": 2, "d2": 1, "name": "dobbelsteen03c.png"}, {"src": "assets/images/dobbelsteen04a.png", "total": 4, "nDice": 1, "d1": 4, "d2": null, "name": "dobbelsteen04a.png"}, {"src": "assets/images/dobbelsteen04b.png", "total": 4, "nDice": 2, "d1": 1, "d2": 3, "name": "dobbelsteen04b.png"}, {"src": "assets/images/dobbelsteen04c.png", "total": 4, "nDice": 2, "d1": 2, "d2": 2, "name": "dobbelsteen04c.png"}, {"src": "assets/images/dobbelsteen04d.png", "total": 4, "nDice": 2, "d1": 3, "d2": 1, "name": "dobbelsteen04d.png"}, {"src": "assets/images/dobbelsteen05a.png", "total": 5, "nDice": 1, "d1": 5, "d2": null, "name": "dobbelsteen05a.png"}, {"src": "assets/images/dobbelsteen05b.png", "total": 5, "nDice": 2, "d1": 1, "d2": 4, "name": "dobbelsteen05b.png"}, {"src": "assets/images/dobbelsteen05c.png", "total": 5, "nDice": 2, "d1": 2, "d2": 3, "name": "dobbelsteen05c.png"}, {"src": "assets/images/dobbelsteen05d.png", "total": 5, "nDice": 2, "d1": 3, "d2": 2, "name": "dobbelsteen05d.png"}, {"src": "assets/images/dobbelsteen05e.png", "total": 5, "nDice": 2, "d1": 4, "d2": 1, "name": "dobbelsteen05e.png"}, {"src": "assets/images/dobbelsteen06a.png", "total": 6, "nDice": 1, "d1": 6, "d2": null, "name": "dobbelsteen06a.png"}, {"src": "assets/images/dobbelsteen06b.png", "total": 6, "nDice": 2, "d1": 1, "d2": 5, "name": "dobbelsteen06b.png"}, {"src": "assets/images/dobbelsteen06c.png", "total": 6, "nDice": 2, "d1": 2, "d2": 4, "name": "dobbelsteen06c.png"}, {"src": "assets/images/dobbelsteen06d.png", "total": 6, "nDice": 2, "d1": 3, "d2": 3, "name": "dobbelsteen06d.png"}, {"src": "assets/images/dobbelsteen06e.png", "total": 6, "nDice": 2, "d1": 4, "d2": 2, "name": "dobbelsteen06e.png"}, {"src": "assets/images/dobbelsteen06f.png", "total": 6, "nDice": 2, "d1": 5, "d2": 1, "name": "dobbelsteen06f.png"}, {"src": "assets/images/dobbelsteen07a.png", "total": 7, "nDice": 2, "d1": 1, "d2": 6, "name": "dobbelsteen07a.png"}, {"src": "assets/images/dobbelsteen07b.png", "total": 7, "nDice": 2, "d1": 2, "d2": 5, "name": "dobbelsteen07b.png"}, {"src": "assets/images/dobbelsteen07c.png", "total": 7, "nDice": 2, "d1": 5, "d2": 2, "name": "dobbelsteen07c.png"}, {"src": "assets/images/dobbelsteen07d.png", "total": 7, "nDice": 2, "d1": 6, "d2": 1, "name": "dobbelsteen07d.png"}, {"src": "assets/images/dobbelsteen08a.png", "total": 8, "nDice": 2, "d1": 2, "d2": 6, "name": "dobbelsteen08a.png"}, {"src": "assets/images/dobbelsteen08b.png", "total": 8, "nDice": 2, "d1": 4, "d2": 4, "name": "dobbelsteen08b.png"}, {"src": "assets/images/dobbelsteen08c.png", "total": 8, "nDice": 2, "d1": 6, "d2": 2, "name": "dobbelsteen08c.png"}, {"src": "assets/images/dobbelsteen09a.png", "total": 9, "nDice": 2, "d1": 4, "d2": 5, "name": "dobbelsteen09a.png"}, {"src": "assets/images/dobbelsteen09b.png", "total": 9, "nDice": 2, "d1": 5, "d2": 4, "name": "dobbelsteen09b.png"}, {"src": "assets/images/dobbelsteen10.png", "total": 10, "nDice": 2, "d1": 5, "d2": 5, "name": "dobbelsteen10.png"}];
+(() => {
+  const DICE_MAP = {"1": ["dobbelsteen01a.png"], "2": ["dobbelsteen02a.png", "dobbelsteen02b.png"], "3": ["dobbelsteen03a.png", "dobbelsteen03b.png", "dobbelsteen03c.png"], "4": ["dobbelsteen04a.png", "dobbelsteen04b.png", "dobbelsteen04c.png", "dobbelsteen04d.png"], "5": ["dobbelsteen05a.png", "dobbelsteen05b.png", "dobbelsteen05c.png", "dobbelsteen05d.png"], "6": ["dobbelsteen06a.png", "dobbelsteen06b.png", "dobbelsteen06c.png", "dobbelsteen06d.png", "dobbelsteen06e.png", "dobbelsteen06f.png"], "7": ["dobbelsteen07a.png", "dobbelsteen07b.png", "dobbelsteen07c.png", "dobbelsteen07d.png"], "8": ["dobbelsteen08a.png", "dobbelsteen08b.png", "dobbelsteen08c.png"], "9": ["dobbelsteen09a.png", "dobbelsteen09b.png"]};
 
-const $ = (id) => document.getElementById(id);
+  const qs = (id) => document.getElementById(id);
 
-const topbar = $("topbar");
-const minTotal = $("minTotal");
-const maxTotal = $("maxTotal");
-const diceCountGroup = $("diceCountGroup");
-const typeGroup = $("typeGroup");
-const relGroup = $("relGroup");
-const flashMs = $("flashMs");
-const flashLabel = $("flashLabel");
-const startBtn = $("startBtn");
-const fsBtn = $("fsBtn");
+  const stim = qs("stim");
+  const mask = qs("mask");
+  const pad = qs("pad");
+  const flashEmoji = qs("flashEmoji");
+  const bigAnswer = qs("bigAnswer");
 
-const diceImg = $("diceImg");
-const mask = $("mask");
-const pad = $("pad");
-const feedback = $("feedback");
-const emoji = $("emoji");
-const bign = $("bign");
+  const gearBtn = qs("gearBtn");
+  const modal = qs("modal");
+  const closeBtn = qs("closeBtn");
 
-let ALL_ITEMS = [];
-let current = null;
-let awaiting = false;
-let running = false;
-let bag = [];
-let buckets = new Map();
-let recent = [];
-let lastKey = "";
-let attempt = 0;
+  const minTotalEl = qs("minTotal");
+  const maxTotalEl = qs("maxTotal");
+  const flashMsEl = qs("flashMs");
 
-function clamp(n, a, b) {
-  return Math.max(a, Math.min(b, n));
-}
+  const repDiceEl = qs("repDice");
+  const repTallyEl = qs("repTally");
+  const repShapesEl = qs("repShapes");
+  const repFingersEl = qs("repFingers");
+  const repTenEl = qs("repTen");
 
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+  const autoNextEl = qs("autoNext");
+  const soundOnEl = qs("soundOn");
+  const autoLevelEl = qs("autoLevel");
 
-function syncTopbarHeight() {
-  const h = topbar.offsetHeight || 72;
-  document.documentElement.style.setProperty("--topbar-h", h + "px");
-}
+  const applyBtn = qs("applyBtn");
+  const startBtn = qs("startBtn");
+  const resetProgressBtn = qs("resetProgressBtn");
+  const levelPills = qs("levelPills");
 
-function getDiceCount() {
-  const on = new Set();
-  diceCountGroup.querySelectorAll(".tbtn.active").forEach(b => on.add(Number(b.dataset.c)));
-  if (on.size === 0) {
-    diceCountGroup.querySelectorAll(".tbtn").forEach(b => b.classList.add("active"));
-    on.add(1); on.add(2);
-  }
-  return on;
-}
+  const sDots = [qs("s1"),qs("s2"),qs("s3"),qs("s4"),qs("s5")];
 
-function getTypes() {
-  const set = new Set();
-  typeGroup.querySelectorAll(".tbtn.active").forEach(b => set.add(b.dataset.t));
-  return set;
-}
+  const LEVELS = [
+    { id: 1, min: 1, max: 3, flashMs: 1200, reps: ["shapes","fingers"] },
+    { id: 2, min: 1, max: 4, flashMs: 1050, reps: ["shapes","fingers","tally"] },
+    { id: 3, min: 1, max: 6, flashMs: 900,  reps: ["dice","shapes","fingers","tally"] },
+    { id: 4, min: 1, max: 9, flashMs: 800,  reps: ["dice","shapes","tally"] },
+    { id: 5, min: 1, max: 10, flashMs: 720, reps: ["ten","fingers","tally","shapes"] },
+    { id: 6, min: 1, max: 12, flashMs: 650, reps: ["ten","tally","shapes"] },
+  ];
 
-function getRels() {
-  const set = new Set();
-  relGroup.querySelectorAll(".tbtn.active").forEach(b => set.add(b.dataset.r));
-  return set;
-}
+  const storeKey = "subiteer_kleuter_v1";
+  const defaultSettings = {
+    level: 3,
+    minTotal: 1,
+    maxTotal: 6,
+    flashMs: 900,
+    reps: {
+      dice: true,
+      tally: true,
+      shapes: true,
+      fingers: true,
+      ten: false
+    },
+    autoNext: true,
+    soundOn: true,
+    autoLevel: false
+  };
 
-function relOk(it, rels) {
-  if (rels.size === 0) return true;
-  const a = it.d1, b = it.d2;
-  return (rels.has("equal") && a === b) ||
-         (rels.has("first") && a > b) ||
-         (rels.has("second") && b > a);
-}
+  const state = {
+    phase: "idle", // idle, flash, answer, feedback
+    target: 1,
+    rep: "shapes",
+    lastAnswers: [], // true false ring
+    roundIndex: 0,
+    stats: {}, // per number
+    settings: loadSettings(),
+    audio: null,
+    allowInput: false
+  };
 
-function matchContainsNumberOnSmallerSide(it, n, rels) {
-  const a = it.d1, b = it.d2;
-  if (rels.size === 0) return (a === n || b === n);
-
-  let ok = false;
-  if (rels.has("equal") && a === b && a === n) ok = true;
-  if (rels.has("first") && a > b && b === n) ok = true;   // tweede is kleiner
-  if (rels.has("second") && b > a && a === n) ok = true;  // eerste is kleiner
-  return ok;
-}
-
-function typeOk(it, types, rels) {
-  if (types.size === 0) return true;
-  for (const t of types) {
-    if (t === "diff1" && matchContainsNumberOnSmallerSide(it, 1, rels)) return true;
-    if (t === "diff2" && matchContainsNumberOnSmallerSide(it, 2, rels)) return true;
-  }
-  return false;
-}
-
-function itemEligible(it, minT, maxT, diceOn, types, rels) {
-  if (it.total < minT || it.total > maxT) return false;
-
-  // als er mix of vergelijken aan staat, dan alleen 2 dobbelstenen
-  if ((types.size > 0 || rels.size > 0) && it.nDice !== 2) return false;
-
-  if (!diceOn.has(it.nDice)) return false;
-  if (!relOk(it, rels)) return false;
-  if (!typeOk(it, types, rels)) return false;
-
-  return true;
-}
-
-function settingsKey() {
-  const minT = clamp(parseInt(minTotal.value || "0", 10), 0, 20);
-  const maxT = clamp(parseInt(maxTotal.value || "10", 10), 0, 20);
-  const diceOn = Array.from(getDiceCount()).sort().join("");
-  const types = Array.from(getTypes()).sort().join(",");
-  const rels = Array.from(getRels()).sort().join(",");
-  const ms = flashMs.value;
-  return [minT, maxT, diceOn, types, rels, ms].join("|");
-}
-
-function buildBuckets() {
-  const minT = clamp(parseInt(minTotal.value || "0", 10), 0, 20);
-  const maxT = clamp(parseInt(maxTotal.value || "10", 10), 0, 20);
-  if (minT > maxT) minTotal.value = String(maxT);
-
-  const diceOn = getDiceCount();
-  const types = getTypes();
-  const rels = getRels();
-
-  // als er mix of vergelijken aan staat, zet 2 aan (zodat je niet per ongeluk leeg speelt)
-  if ((types.size > 0 || rels.size > 0) && !diceOn.has(2)) {
-    const b2 = diceCountGroup.querySelector('[data-c="2"]');
-    if (b2) b2.classList.add("active");
-    diceOn.add(2);
-  }
-
-  const temp = new Map();
-  for (const it of ALL_ITEMS) {
-    if (!itemEligible(it, minT, maxT, diceOn, types, rels)) continue;
-    const k = it.total;
-    if (!temp.has(k)) temp.set(k, []);
-    temp.get(k).push(it);
-  }
-
-  // geen items, dan maak de selectie wat ruimer, maar blijf bij 2 dobbelstenen als dat logisch is
-  if (temp.size === 0) {
-    for (const it of ALL_ITEMS) {
-      if (it.total < minT || it.total > maxT) continue;
-      if ((types.size > 0 || rels.size > 0) && it.nDice !== 2) continue;
-      if (!diceOn.has(it.nDice)) continue;
-      const k = it.total;
-      if (!temp.has(k)) temp.set(k, []);
-      temp.get(k).push(it);
+  function loadSettings(){
+    try {
+      const raw = localStorage.getItem(storeKey);
+      if (!raw) return structuredClone(defaultSettings);
+      const parsed = JSON.parse(raw);
+      return {
+        ...structuredClone(defaultSettings),
+        ...parsed,
+        reps: {...structuredClone(defaultSettings).reps, ...(parsed.reps || {})}
+      };
+    } catch (e) {
+      return structuredClone(defaultSettings);
     }
   }
 
-  buckets = temp;
-  const totals = Array.from(buckets.keys()).sort((a,b)=>a-b);
-  bag = shuffle(totals.slice());
-}
-
-function pickNextItem() {
-  const key = settingsKey();
-  if (key !== lastKey || bag.length === 0) {
-    lastKey = key;
-    buildBuckets();
-  }
-  if (bag.length === 0) buildBuckets();
-  let total = bag.pop();
-  if (!buckets.has(total) || buckets.get(total).length === 0) {
-    buildBuckets();
-    total = bag.pop();
+  function saveSettings(){
+    localStorage.setItem(storeKey, JSON.stringify(state.settings));
   }
 
-  const list = buckets.get(total) || [];
-  const fresh = list.filter(it => !recent.includes(it.src));
-  const pool = fresh.length ? fresh : list;
-  const chosen = pool[Math.floor(Math.random() * pool.length)];
-  return chosen;
-}
+  function structuredClone(obj){ return JSON.parse(JSON.stringify(obj)); }
 
-function wait(ms) {
-  return new Promise(r => setTimeout(r, ms));
-}
+  function openModal(){ modal.classList.add("show"); }
+  function closeModal(){ modal.classList.remove("show"); }
 
-function showDice(item) {
-  diceImg.src = item.src;
-  diceImg.classList.remove("hidden");
-  mask.classList.add("off");
-}
-
-function hideDice() {
-  mask.classList.remove("off");     // zwart vlak aan
-  diceImg.classList.add("hidden");  // zekerheid, ook bij traag laden
-}
-
-function hideFeedback() {
-  feedback.classList.remove("on");
-  emoji.textContent = "";
-  bign.textContent = "";
-}
-
-function showFeedback(ok, correctTotal) {
-  emoji.textContent = ok ? "🎉" : "😅";
-  bign.textContent = ok ? String(correctTotal) : "";
-  feedback.classList.add("on");
-}
-
-function buildPad() {
-  pad.innerHTML = "";
-  for (let i = 1; i <= 10; i++) {
-    const b = document.createElement("button");
-    b.className = "nbtn";
-    b.textContent = String(i);
-    b.dataset.n = String(i);
-    b.addEventListener("click", () => handleAnswer(i));
-    pad.appendChild(b);
-  }
-}
-
-function updatePadAvailability() {
-  const minT = clamp(parseInt(minTotal.value || "0", 10), 0, 20);
-  const maxT = clamp(parseInt(maxTotal.value || "10", 10), 0, 20);
-  pad.querySelectorAll("button").forEach(btn => {
-    const n = Number(btn.dataset.n);
-    const inRange = (n >= minT && n <= maxT);
-    const enabled = inRange && awaiting;
-    btn.classList.toggle("disabled", !enabled);
-    btn.disabled = !enabled;
+  gearBtn.addEventListener("click", () => {
+    syncUIFromSettings();
+    openModal();
   });
-}
+  closeBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
 
-async function flashItem(item) {
-  awaiting = false;
-  updatePadAvailability();
-  hideFeedback();
-
-  showDice(item);
-  await wait(Number(flashMs.value));
-  hideDice();
-
-  awaiting = true;
-  updatePadAvailability();
-}
-
-async function nextRound() {
-  if (!running) return;
-  current = pickNextItem();
-  attempt = 0;
-  recent.push(current.src);
-  if (recent.length > 8) recent.shift();
-  await flashItem(current);
-}
-
-async function replaySame() {
-  if (!running || !current) return;
-  attempt += 1;
-  await flashItem(current);
-}
-
-async function handleAnswer(n) {
-  if (!running || !awaiting || !current) return;
-  awaiting = false;
-  updatePadAvailability();
-
-  const ok = (n === current.total);
-  showFeedback(ok, current.total);
-
-  if (ok) {
-    await wait(900);
-    hideFeedback();
-    await wait(120);
-    await nextRound();
-  } else {
-    await wait(650);
-    hideFeedback();
-    await wait(120);
-    await replaySame();
+  function clampInt(v, min, max){
+    const n = Number.parseInt(v, 10);
+    if (Number.isNaN(n)) return min;
+    return Math.max(min, Math.min(max, n));
   }
-}
 
-function wireToggleGroup(el) {
-  el.querySelectorAll(".tbtn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      btn.classList.toggle("active");
-      lastKey = "";
-      updatePadAvailability();
+  function enabledRepsList(){
+    const r = [];
+    const reps = state.settings.reps;
+    if (reps.dice) r.push("dice");
+    if (reps.tally) r.push("tally");
+    if (reps.shapes) r.push("shapes");
+    if (reps.fingers) r.push("fingers");
+    if (reps.ten) r.push("ten");
+    return r;
+  }
+
+  function repSupports(rep, n){
+    if (rep === "dice") return !!DICE_MAP[n];
+    if (rep === "ten") return n <= 10;
+    if (rep === "fingers") return n <= 10;
+    if (rep === "tally") return n <= 20;
+    if (rep === "shapes") return n <= 12;
+    return true;
+  }
+
+  function pickRep(n){
+    const reps = enabledRepsList().filter(r => repSupports(r, n));
+    const list = reps.length ? reps : ["shapes"];
+    // mix zodat het niet voorspelbaar wordt
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function ensureStats(){
+    const min = state.settings.minTotal;
+    const max = state.settings.maxTotal;
+    for (let n = min; n <= max; n++) {
+      if (!state.stats[n]) {
+        state.stats[n] = { seen: 0, ok: 0, bad: 0, last: -999 };
+      }
+    }
+  }
+
+  function weightedPickNumber(){
+    ensureStats();
+    const min = state.settings.minTotal;
+    const max = state.settings.maxTotal;
+
+    const items = [];
+    let sum = 0;
+
+    for (let n = min; n <= max; n++) {
+      const st = state.stats[n];
+      const wrong = st.bad;
+      const seen = st.seen;
+      const recentPenalty = (state.roundIndex - st.last) <= 2 ? 0.35 : 1.0;
+
+      // basisgewicht, fouten zwaarder, weinig gezien iets zwaarder
+      let w = 1.0;
+      w += wrong * 1.8;
+      w += Math.max(0, 3 - seen) * 0.6;
+      w *= recentPenalty;
+
+      // kleine bonus voor nummers die net fout gingen
+      if (state.lastAnswers.length && state.lastAnswers[state.lastAnswers.length - 1] === false) {
+        w += wrong > 0 ? 0.4 : 0;
+      }
+
+      // vermijd getallen die geen enkel gekozen beeld ondersteunen
+      const reps = enabledRepsList();
+      const hasAny = reps.some(r => repSupports(r, n));
+      if (!hasAny) w = 0.2;
+
+      items.push([n, w]);
+      sum += w;
+    }
+
+    let r = Math.random() * sum;
+    for (const [n, w] of items) {
+      r -= w;
+      if (r <= 0) return n;
+    }
+    return min;
+  }
+
+  function setDotsFromHistory(){
+    sDots.forEach(d => d.className = "dot");
+    const hist = state.lastAnswers.slice(-5);
+    for (let i = 0; i < hist.length; i++) {
+      const ok = hist[hist.length - 1 - i];
+      if (ok === true) sDots[4 - i].classList.add("ok");
+      if (ok === false) sDots[4 - i].classList.add("bad");
+    }
+  }
+
+  function renderPad(){
+    pad.innerHTML = "";
+    const max = state.settings.maxTotal;
+    const min = state.settings.minTotal;
+
+    const nums = [];
+    for (let n = min; n <= max; n++) nums.push(n);
+
+    const count = nums.length;
+
+    let colsDesktop = 6;
+    let colsMobile = 4;
+
+    if (count <= 4){
+      colsDesktop = count;
+      colsMobile = count;
+    } else if (count <= 6){
+      colsDesktop = 3;
+      colsMobile = 3;
+    } else if (count <= 10){
+      colsDesktop = 5;
+      colsMobile = 4;
+    } else if (count <= 12){
+      colsDesktop = 6;
+      colsMobile = 4;
+    } else {
+      colsDesktop = 8;
+      colsMobile = 5;
+    }
+
+    pad.style.gridTemplateColumns = window.innerWidth <= 600 ? `repeat(${colsMobile}, 1fr)` : `repeat(${colsDesktop}, 1fr)`;
+
+    nums.forEach((n) => {
+      const b = document.createElement("div");
+      b.className = "num";
+      b.textContent = n;
+      b.setAttribute("role", "button");
+      b.setAttribute("aria-label", String(n));
+      b.addEventListener("click", () => onAnswer(n));
+      pad.appendChild(b);
     });
-  });
-}
 
-function wireControls() {
-  wireToggleGroup(diceCountGroup);
-  wireToggleGroup(typeGroup);
-  wireToggleGroup(relGroup);
+    setPadEnabled(false);
+  }
 
-  [minTotal, maxTotal].forEach(inp => inp.addEventListener("input", () => {
-    lastKey = "";
-    updatePadAvailability();
-  }));
+  function setPadEnabled(on){
+    state.allowInput = on;
+    [...pad.querySelectorAll(".num")].forEach((b) => {
+      const inRange = b.style.pointerEvents !== "none";
+      b.setAttribute("aria-disabled", (on && inRange) ? "false" : "true");
+    });
+  }
 
-  flashMs.addEventListener("input", () => {
-    flashLabel.textContent = String(flashMs.value);
-    lastKey = "";
+  function clearStim(){
+    stim.innerHTML = "";
+  }
+
+  function showStim(rep, n){
+    clearStim();
+    state.rep = rep;
+
+    if (rep === "dice") {
+      const list = DICE_MAP[n] || [];
+      const file = list[Math.floor(Math.random() * list.length)];
+      const img = document.createElement("img");
+      img.src = "dice_assets/" + file;
+      img.alt = "";
+      stim.appendChild(img);
+      return;
+    }
+
+    if (rep === "ten") {
+      stim.appendChild(svgTenFrame(n));
+      return;
+    }
+
+    if (rep === "tally") {
+      stim.appendChild(svgTallies(n));
+      return;
+    }
+
+    if (rep === "fingers") {
+      stim.appendChild(svgFingers(n));
+      return;
+    }
+
+    stim.appendChild(svgDotPattern(n));
+  }
+
+  function svgWrap(w, h){
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "100%");
+    svg.setAttribute("aria-hidden", "true");
+    return svg;
+  }
+
+  function dot(svg, cx, cy, r, fill){
+    const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    c.setAttribute("cx", cx);
+    c.setAttribute("cy", cy);
+    c.setAttribute("r", r);
+    c.setAttribute("fill", fill);
+    svg.appendChild(c);
+  }
+
+  function rect(svg, x, y, w, h, rx, fill, stroke){
+    const r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    r.setAttribute("x", x);
+    r.setAttribute("y", y);
+    r.setAttribute("width", w);
+    r.setAttribute("height", h);
+    r.setAttribute("rx", rx);
+    r.setAttribute("fill", fill);
+    if (stroke) {
+      r.setAttribute("stroke", stroke);
+      r.setAttribute("stroke-width", "3");
+    }
+    svg.appendChild(r);
+  }
+
+  function line(svg, x1, y1, x2, y2, stroke, sw){
+    const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    l.setAttribute("x1", x1);
+    l.setAttribute("y1", y1);
+    l.setAttribute("x2", x2);
+    l.setAttribute("y2", y2);
+    l.setAttribute("stroke", stroke);
+    l.setAttribute("stroke-width", sw);
+    l.setAttribute("stroke-linecap", "round");
+    svg.appendChild(l);
+  }
+
+  function svgTenFrame(n){
+    const svg = svgWrap(520, 260);
+    rect(svg, 20, 40, 480, 180, 28, "rgba(0,0,0,0.18)", "rgba(255,255,255,0.18)");
+
+    const cols = 5;
+    const rows = 2;
+    const cellW = 480 / cols;
+    const cellH = 180 / rows;
+
+    let k = 0;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const cx = 20 + cellW * c + cellW / 2;
+        const cy = 40 + cellH * r + cellH / 2;
+        const filled = (k < n);
+        dot(svg, cx, cy, 22, filled ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.10)");
+        k++;
+      }
+    }
+    return svg;
+  }
+
+  function svgTallies(n){
+    const svg = svgWrap(520, 260);
+    rect(svg, 20, 40, 480, 180, 28, "rgba(0,0,0,0.18)", "rgba(255,255,255,0.18)");
+
+    const stroke = "rgba(255,255,255,0.92)";
+    const gapGroup = 36;
+    const gapLine = 18;
+
+    let x = 70;
+    const yTop = 80;
+    const yBot = 200;
+
+    let remaining = n;
+    while (remaining > 0) {
+      const take = Math.min(5, remaining);
+
+      // 4 verticale
+      const vertical = Math.min(4, take);
+      for (let i = 0; i < vertical; i++) {
+        line(svg, x + i * gapLine, yTop, x + i * gapLine, yBot, stroke, 10);
+      }
+
+      // 5e als schuine streep
+      if (take === 5) {
+        line(svg, x - 4, yBot - 8, x + (3 * gapLine) + 4, yTop + 8, stroke, 10);
+      }
+
+      remaining -= take;
+      x += (gapLine * 4) + gapGroup;
+      if (x > 460) break;
+    }
+    return svg;
+  }
+
+  function svgFingers(n){
+    const svg = svgWrap(520, 260);
+    rect(svg, 20, 40, 480, 180, 28, "rgba(0,0,0,0.18)", "rgba(255,255,255,0.18)");
+
+    const left = Math.min(5, n);
+    const right = Math.max(0, n - 5);
+
+    const hand = (x0, raised) => {
+      // palm
+      rect(svg, x0, 120, 160, 88, 28, "rgba(255,255,255,0.08)", "rgba(255,255,255,0.16)");
+      // vingers als stippen boven palm
+      const xs = [x0+25, x0+55, x0+85, x0+115, x0+145];
+      xs.forEach((x, i) => {
+        const on = i < raised;
+        dot(svg, x, 105, 18, on ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.10)");
+      });
+    };
+
+    hand(90, left);
+    hand(270, right);
+    return svg;
+  }
+
+  function svgDotPattern(n){
+    // Patronen om in één oogopslag structuur te zien
+    const svg = svgWrap(520, 260);
+    rect(svg, 20, 40, 480, 180, 28, "rgba(0,0,0,0.18)", "rgba(255,255,255,0.18)");
+
+    const fill = "rgba(255,255,255,0.92)";
+    const empty = "rgba(255,255,255,0.10)";
+    const r = 20;
+
+    let positions = [];
+    if (n <= 9) {
+      // 3 x 3
+      const xs = [160, 260, 360];
+      const ys = [90, 140, 190];
+      const order = [
+        [1,1],
+        [0,0],[2,2],
+        [2,0],[0,2],
+        [0,1],[2,1],
+        [1,0],[1,2]
+      ];
+      positions = order.map(([cx,cy]) => [xs[cx], ys[cy]]);
+      // teken achtergrondpunten zacht
+      for (const [x,y] of positions) dot(svg, x, y, r, empty);
+      for (let i=0;i<n;i++) dot(svg, positions[i][0], positions[i][1], r, fill);
+    } else {
+      // 4 x 3, tot 12
+      const xs = [140, 220, 300, 380];
+      const ys = [90, 140, 190];
+      const order = [
+        [1,1],[2,1],
+        [0,0],[3,2],
+        [3,0],[0,2],
+        [0,1],[3,1],
+        [1,0],[2,0],
+        [1,2],[2,2],
+      ];
+      positions = order.map(([cx,cy]) => [xs[cx], ys[cy]]);
+      for (const [x,y] of positions) dot(svg, x, y, r, empty);
+      const count = Math.min(n, positions.length);
+      for (let i=0;i<count;i++) dot(svg, positions[i][0], positions[i][1], r, fill);
+    }
+
+    return svg;
+  }
+
+  function ensureAudio(){
+    if (state.audio) return;
+    try {
+      state.audio = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      state.audio = null;
+    }
+  }
+
+  function beep(ok){
+    if (!state.settings.soundOn) return;
+    ensureAudio();
+    const ctx = state.audio;
+    if (!ctx) return;
+
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+
+    o.type = "sine";
+    o.frequency.value = ok ? 660 : 240;
+
+    g.gain.value = 0.0001;
+    o.connect(g);
+    g.connect(ctx.destination);
+
+    const now = ctx.currentTime;
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(0.10, now + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+
+    o.start(now);
+    o.stop(now + 0.2);
+  }
+
+  function showFeedback(ok, correctNumber){
+    flashEmoji.textContent = ok ? "😄" : "😕";
+    flashEmoji.classList.add("show");
+
+    bigAnswer.textContent = String(correctNumber);
+    bigAnswer.classList.add("show");
+
+    setTimeout(() => {
+      flashEmoji.classList.remove("show");
+      bigAnswer.classList.remove("show");
+    }, 700);
+  }
+
+  function sleep(ms){ return new Promise(res => setTimeout(res, ms)); }
+
+  async function nextRound() {
+    state.roundIndex += 1;
+    state.phase = "flash";
+
+    const n = weightedPickNumber();
+    state.target = n;
+    state.rep = pickRep(n);
+
+    showStim(state.rep, n);
+
+    // even in beeld
+    mask.classList.remove("show");
+    setPadEnabled(false);
+
+    await sleep(state.settings.flashMs);
+
+    // weg, nu ophalen
+    mask.classList.add("show");
+    state.phase = "answer";
+    setPadEnabled(true);
+  }
+
+  function updateStats(correct) {
+    ensureStats();
+    const st = state.stats[state.target];
+    st.seen += 1;
+    st.last = state.roundIndex;
+    if (correct) st.ok += 1;
+    else st.bad += 1;
+
+    state.lastAnswers.push(correct);
+    if (state.lastAnswers.length > 12) state.lastAnswers.shift();
+    setDotsFromHistory();
+  }
+
+  function maybeAutoLevel() {
+    if (!state.settings.autoLevel) return;
+
+    // 10 laatste, minimaal 8 goed
+    const last10 = state.lastAnswers.slice(-10);
+    if (last10.length < 10) return;
+    const okCount = last10.filter(Boolean).length;
+    if (okCount < 8) return;
+
+    const current = state.settings.level;
+    if (current >= LEVELS.length) return;
+    applyLevel(current + 1);
+  }
+
+  async function onAnswer(n) {
+    if (!state.allowInput) return;
+
+    state.allowInput = false;
+    setPadEnabled(false);
+
+    const ok = (n === state.target);
+    beep(ok);
+
+    updateStats(ok);
+
+    // feedback met opnieuw zien
+    mask.classList.remove("show");
+    showStim(state.rep, state.target);
+    showFeedback(ok, state.target);
+
+    maybeAutoLevel();
+
+    if (state.settings.autoNext) {
+      await sleep(650);
+      await nextRound();
+    } else {
+      // tik ergens op het bord om door te gaan
+      state.phase = "feedback";
+      mask.classList.add("show");
+      mask.textContent = "▶";
+      mask.style.opacity = "1";
+      mask.style.pointerEvents = "auto";
+      const handler = async () => {
+        mask.style.pointerEvents = "none";
+        mask.textContent = "";
+        mask.classList.remove("show");
+        mask.removeEventListener("click", handler);
+        await nextRound();
+      };
+      mask.addEventListener("click", handler);
+    }
+  }
+
+  function syncUIFromSettings() {
+    minTotalEl.value = state.settings.minTotal;
+    maxTotalEl.value = state.settings.maxTotal;
+    flashMsEl.value = state.settings.flashMs;
+
+    repDiceEl.checked = !!state.settings.reps.dice;
+    repTallyEl.checked = !!state.settings.reps.tally;
+    repShapesEl.checked = !!state.settings.reps.shapes;
+    repFingersEl.checked = !!state.settings.reps.fingers;
+    repTenEl.checked = !!state.settings.reps.ten;
+
+    autoNextEl.checked = !!state.settings.autoNext;
+    soundOnEl.checked = !!state.settings.soundOn;
+    autoLevelEl.checked = !!state.settings.autoLevel;
+
+    [...levelPills.children].forEach((p) => {
+      const id = Number(p.getAttribute("data-level"));
+      p.classList.toggle("on", id === state.settings.level);
+    });
+  }
+
+  function applySettingsFromUI() {
+    const minTotal = clampInt(minTotalEl.value, 1, 20);
+    const maxTotal = clampInt(maxTotalEl.value, 1, 20);
+    const flashMs = clampInt(flashMsEl.value, 250, 2500);
+
+    const reps = {
+      dice: repDiceEl.checked,
+      tally: repTallyEl.checked,
+      shapes: repShapesEl.checked,
+      fingers: repFingersEl.checked,
+      ten: repTenEl.checked
+    };
+
+    // minstens één beeld
+    const anyRep = Object.values(reps).some(Boolean);
+    if (!anyRep) reps.shapes = true;
+
+    const fixedMin = Math.min(minTotal, maxTotal);
+    const fixedMax = Math.max(minTotal, maxTotal);
+
+    state.settings.minTotal = fixedMin;
+    state.settings.maxTotal = fixedMax;
+    state.settings.flashMs = flashMs;
+    state.settings.reps = reps;
+    state.settings.autoNext = autoNextEl.checked;
+    state.settings.soundOn = soundOnEl.checked;
+    state.settings.autoLevel = autoLevelEl.checked;
+
+    // schoon pad, andere reeksen kunnen nieuwe knoppen vereisen
+    renderPad();
+    saveSettings();
+  }
+
+  function applyLevel(levelId) {
+    const lvl = LEVELS.find(l => l.id === levelId) || LEVELS[0];
+    state.settings.level = lvl.id;
+    state.settings.minTotal = lvl.min;
+    state.settings.maxTotal = lvl.max;
+    state.settings.flashMs = lvl.flashMs;
+
+    // zet reps uit, zet preset reps aan
+    state.settings.reps = { dice:false, tally:false, shapes:false, fingers:false, ten:false };
+    lvl.reps.forEach(r => {
+      if (r === "dice") state.settings.reps.dice = true;
+      if (r === "tally") state.settings.reps.tally = true;
+      if (r === "shapes") state.settings.reps.shapes = true;
+      if (r === "fingers") state.settings.reps.fingers = true;
+      if (r === "ten") state.settings.reps.ten = true;
+    });
+
+    renderPad();
+    saveSettings();
+    syncUIFromSettings();
+  }
+
+  function resetProgress() {
+    state.stats = {};
+    state.lastAnswers = [];
+    setDotsFromHistory();
+  }
+
+  function buildLevelPills() {
+    levelPills.innerHTML = "";
+    LEVELS.forEach((lvl) => {
+      const p = document.createElement("div");
+      p.className = "pill";
+      p.textContent = "L" + lvl.id;
+      p.setAttribute("data-level", String(lvl.id));
+      p.addEventListener("click", () => {
+        applyLevel(lvl.id);
+      });
+      levelPills.appendChild(p);
+    });
+  }
+
+  applyBtn.addEventListener("click", () => {
+    applySettingsFromUI();
+    closeModal();
   });
 
   startBtn.addEventListener("click", async () => {
-    running = !running;
-    startBtn.textContent = running ? "⏸" : "▶";
-    hideFeedback();
-    hideDice();
-    awaiting = false;
-    updatePadAvailability();
-    if (running) {
-      await wait(120);
-      await nextRound();
-    }
+    applySettingsFromUI();
+    closeModal();
+    await startGame();
   });
 
-  fsBtn.addEventListener("click", async () => {
-    try {
-      if (!document.fullscreenElement) {
-        await document.documentElement.requestFullscreen();
-      } else {
-        await document.exitFullscreen();
-      }
-    } catch (e) {}
+  resetProgressBtn.addEventListener("click", () => {
+    resetProgress();
+    saveSettings();
   });
-}
 
-diceImg.addEventListener("error", () => {
-  if (!current) return;
-  ALL_ITEMS = ALL_ITEMS.filter(it => it.src !== current.src);
-  lastKey = "";
-  if (running) nextRound();
-});
-
-
-async function validateAssets(items) {
-  const ok = [];
-  const limit = 4;
-  let idx = 0;
-
-  async function tryOne(it) {
-    return await new Promise(resolve => {
-      const im = new Image();
-      let done = false;
-      const finish = (v) => { if (done) return; done = true; resolve(v); };
-      im.onload = () => finish(true);
-      im.onerror = () => finish(false);
-      im.src = it.src;
-      // kleine failsafe, geen eindeloze hang
-      setTimeout(() => finish(false), 3500);
-    });
+  function safeStartStim() {
+    stim.innerHTML = "";
+    mask.textContent = "";
+    mask.classList.add("show");
+    mask.style.pointerEvents = "none";
   }
 
-  async function worker() {
-    while (idx < items.length) {
-      const i = idx++;
-      const it = items[i];
-      const ok1 = await tryOne(it);
-      if (ok1) ok.push(it);
-    }
+  async function startGame() {
+    resetProgress();
+    renderPad();
+    safeStartStim();
+    await sleep(250);
+    await nextRound();
   }
 
-  await Promise.all(Array.from({length: limit}, () => worker()));
-  return ok;
-}
+  window.addEventListener("resize", () => renderPad());
 
+  // init
+  buildLevelPills();
+  renderPad();
+  syncUIFromSettings();
+  setDotsFromHistory();
+  safeStartStim();
 
-(async function init() {
-  buildPad();
-  wireControls();
+  // start meteen, zodat het klaar staat
+  startGame();
 
-  flashLabel.textContent = String(flashMs.value);
-  hideDice();
-  hideFeedback();
-
-  syncTopbarHeight();
-  try {
-    new ResizeObserver(syncTopbarHeight).observe(topbar);
-  } catch (e) {
-    window.addEventListener("resize", syncTopbarHeight);
-  }
-
-  ALL_ITEMS = await validateAssets(RAW_ITEMS);
-
-  lastKey = "";
-  updatePadAvailability();
 })();
 </script>
 </body>
