@@ -23,8 +23,9 @@
     margin: 0;
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     color: var(--text);
-    background: radial-gradient(900px 500px at 20% 10%, rgba(255,255,255,0.18), transparent 55%),
-                linear-gradient(135deg, var(--bg1), var(--bg2));
+    background:
+      radial-gradient(900px 500px at 20% 10%, rgba(255,255,255,0.18), transparent 55%),
+      linear-gradient(135deg, var(--bg1), var(--bg2));
     overflow-x: hidden;
   }
 
@@ -33,7 +34,7 @@
     top: 0;
     left: 0;
     right: 0;
-    padding: 10px 12px calc(10px + env(safe-area-inset-top));
+    padding: calc(10px + env(safe-area-inset-top)) 12px 10px 12px;
     display: flex;
     gap: 10px;
     align-items: center;
@@ -58,6 +59,7 @@
     font-size: 12px;
     color: var(--muted);
     letter-spacing: 0.02em;
+    user-select: none;
   }
 
   input[type="number"] {
@@ -79,8 +81,9 @@
   .tiny {
     font-size: 12px;
     color: var(--muted);
-    min-width: 34px;
+    min-width: 36px;
     text-align: right;
+    user-select: none;
   }
 
   .tgroup {
@@ -90,85 +93,90 @@
   }
 
   .tbtn {
-    border: 1px solid rgba(255,255,255,0.18);
-    background: rgba(255,255,255,0.10);
-    color: var(--text);
+    border: 0;
+    outline: none;
     padding: 8px 10px;
     border-radius: 14px;
-    font-weight: 800;
-    font-size: 14px;
-    line-height: 1;
     cursor: pointer;
+    background: rgba(0,0,0,0.18);
+    color: rgba(255,255,255,0.92);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
     user-select: none;
-    transition: transform 80ms ease, background 120ms ease, border-color 120ms ease;
   }
-  .tbtn:active { transform: scale(0.98); }
   .tbtn.active {
-    background: rgba(255,255,255,0.22);
-    border-color: rgba(255,255,255,0.30);
+    background: rgba(255,255,255,0.18);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.24);
+  }
+  .tbtn:active {
+    transform: translateY(1px);
   }
 
   .iconbtn {
-    border: 1px solid rgba(255,255,255,0.18);
-    background: rgba(255,255,255,0.12);
-    color: var(--text);
-    width: 40px;
+    border: 0;
+    outline: none;
+    width: 44px;
     height: 40px;
     border-radius: 14px;
     cursor: pointer;
-    user-select: none;
-  }
-  .iconbtn:active { transform: scale(0.98); }
-  .iconbtn.disabled {
-    opacity: 0.45;
-    pointer-events: none;
-  }
-
-  .stage {
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding-top: calc(var(--topbar-h) + 16px);
-    padding-bottom: calc(18px + env(safe-area-inset-bottom));
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .card {
-    width: min(1040px, 96vw);
-    border-radius: var(--radius);
-    background: rgba(0,0,0,0.20);
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: var(--shadow);
-    padding: 16px;
+    background: rgba(0,0,0,0.18);
+    color: rgba(255,255,255,0.92);
+    font-weight: 900;
     display: grid;
-    gap: 14px;
+    place-items: center;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+  }
+  .iconbtn.primary {
+    background: rgba(255,255,255,0.20);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22);
+  }
+
+  .wrap {
+    min-height: 100%;
+    padding-top: calc(var(--topbar-h) + 18px);
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    display: grid;
+    place-items: start center;
+  }
+
+  .panel {
+    width: min(980px, 94vw);
+    padding: 16px;
+    border-radius: var(--radius);
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow: var(--shadow);
   }
 
   .frame {
     width: 100%;
-    height: min(56dvh, 540px);
-    height: min(56vh, 540px);
-    min-height: 280px;
+    height: min(52svh, 540px);
+    min-height: 260px;
     border-radius: 18px;
     background: #000;
     border: 1px solid rgba(255,255,255,0.14);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .stage {
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    position: relative;
-    padding: 16px;
+    padding: clamp(10px, 2.2vw, 22px);
   }
 
-  .frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
+  #diceImg {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
     display: block;
   }
-  .frame img.hidden {
+  #diceImg.hidden {
     opacity: 0;
     visibility: hidden;
   }
@@ -177,152 +185,159 @@
     position: absolute;
     inset: 0;
     background: #000;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 2;
-  }
-  .mask.visible {
     opacity: 1;
+    pointer-events: none;
+    z-index: 3;
+    transition: opacity 140ms ease;
+  }
+  .mask.off {
+    opacity: 0;
   }
 
   .pad {
-    width: 100%;
+    margin-top: 14px;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(10, minmax(0, 1fr));
     gap: 10px;
   }
 
-  .num {
-    border: 1px solid rgba(255,255,255,0.22);
-    background: rgba(255,255,255,0.18);
-    color: var(--text);
+  .nbtn {
+    border: 0;
+    outline: none;
     border-radius: 16px;
     padding: 14px 0;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 900;
     cursor: pointer;
+    background: rgba(0,0,0,0.20);
+    color: rgba(255,255,255,0.94);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14);
     user-select: none;
   }
-  .num:active { transform: scale(0.99); }
-  .num.disabled {
+  .nbtn:active {
+    transform: translateY(1px);
+  }
+  .nbtn.disabled {
     opacity: 0.35;
-    pointer-events: none;
+    cursor: not-allowed;
   }
 
   .feedback {
-    position: fixed;
+    position: absolute;
     inset: 0;
     display: grid;
     place-items: center;
-    opacity: 0;
+    z-index: 6;
     pointer-events: none;
+    opacity: 0;
     transition: opacity 120ms ease;
-    z-index: 80;
   }
-  .feedback.visible {
+  .feedback.on {
     opacity: 1;
   }
-  .result {
+  .fbInner {
     display: grid;
     place-items: center;
     gap: 10px;
-    padding: 16px 18px;
-    border-radius: 18px;
-    background: rgba(0,0,0,0.36);
-    border: 1px solid rgba(255,255,255,0.16);
+    padding: 18px 22px;
+    border-radius: 22px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.14);
     backdrop-filter: blur(8px);
   }
   .emoji {
-    font-size: 56px;
+    font-size: 52px;
     line-height: 1;
   }
   .bign {
-    font-size: 44px;
-    font-weight: 900;
-    letter-spacing: 0.02em;
+    font-size: 52px;
+    font-weight: 950;
+    line-height: 1;
   }
 
   @media (max-width: 720px) {
-    :root { --topbar-h: 112px; }
-    input[type="range"] { width: 120px; }
-    .pad { grid-template-columns: repeat(5, 1fr); }
-  }
-
-  @media (max-width: 420px) {
-    :root { --topbar-h: 132px; }
-    .pad { grid-template-columns: repeat(5, 1fr); gap: 8px; }
-    .num { padding: 12px 0; font-size: 20px; }
+    input[type="range"] { width: 140px; }
+    .pad { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   }
 </style>
 </head>
 <body>
-
-<div class="topbar" id="topbar">
-  <div class="pill">
-    <span class="label">min</span>
-    <input type="number" id="minTotal" value="1" min="0" max="20"/>
-    <span class="label">max</span>
-    <input type="number" id="maxTotal" value="10" min="0" max="20"/>
-  </div>
-
-  <div class="pill">
-    <span class="label">stenen</span>
-    <div class="tgroup" id="diceCountGroup">
-      <button class="tbtn active" data-c="1" title="1 dobbelsteen">1</button>
-      <button class="tbtn active" data-c="2" title="2 dobbelstenen">2</button>
-    </div>
-  </div>
-
-  <div class="pill">
-    <span class="label">mix</span>
-    <div class="tgroup" id="filterGroup">
-      <button class="tbtn" data-f="diff1" title="met een 1">+1</button>
-      <button class="tbtn" data-f="diff2" title="met een 2">+2</button>
-      <button class="tbtn" data-f="equal" title="gelijken">=</button>
-      <button class="tbtn" data-f="first" title="grootste links">1&gt;2</button>
-      <button class="tbtn" data-f="second" title="grootste rechts">2&gt;1</button>
-    </div>
-  </div>
-
-  <div class="pill">
-    <span class="label">flits</span>
-    <input type="range" id="flashMs" min="150" max="2500" step="50" value="800"/>
-    <span class="tiny" id="flashLabel">800</span>
-  </div>
-
-  <button class="iconbtn" id="startBtn" title="start of herstart">▶️</button>
-  <button class="iconbtn" id="revealBtn" title="nog een keer dezelfde">👀</button>
-  <button class="iconbtn" id="fsBtn" title="volledig scherm">⛶</button>
-</div>
-
-<div class="stage">
-  <div class="card">
-    <div class="frame" id="frame">
-      <img id="diceImg" alt=""/>
-      <div class="mask" id="mask"></div>
+  <div class="topbar" id="topbar">
+    <div class="pill">
+      <span class="label">min</span>
+      <input id="minTotal" type="number" value="1" min="0" max="20"/>
+      <span class="label">max</span>
+      <input id="maxTotal" type="number" value="10" min="0" max="20"/>
     </div>
 
-    <div class="pad" id="pad"></div>
-  </div>
-</div>
+    <div class="pill">
+      <span class="label">stenen</span>
+      <div class="tgroup" id="diceCountGroup">
+        <button class="tbtn active" data-c="1" title="1 dobbelsteen">1</button>
+        <button class="tbtn active" data-c="2" title="2 dobbelstenen">2</button>
+      </div>
+    </div>
 
-<div class="feedback" id="feedback">
-  <div class="result">
-    <div class="emoji" id="emoji"></div>
-    <div class="bign" id="bign"></div>
+    <div class="pill">
+      <span class="label">mix</span>
+      <div class="tgroup" id="typeGroup">
+        <button class="tbtn" data-t="diff1" title="minstens één dobbelsteen is 1">+1</button>
+        <button class="tbtn" data-t="diff2" title="minstens één dobbelsteen is 2">+2</button>
+      </div>
+    </div>
+
+    <div class="pill">
+      <span class="label">vergelijk</span>
+      <div class="tgroup" id="relGroup">
+        <button class="tbtn" data-r="equal" title="gelijken">=</button>
+        <button class="tbtn" data-r="first" title="eerste is groter">1&gt;2</button>
+        <button class="tbtn" data-r="second" title="tweede is groter">2&gt;1</button>
+      </div>
+    </div>
+
+    <div class="pill">
+      <span class="label">flits</span>
+      <input id="flashMs" type="range" min="150" max="2200" value="800" step="50"/>
+      <span class="tiny" id="flashLabel">800</span>
+    </div>
+
+    <button class="iconbtn primary" id="startBtn" title="start of pauze">▶</button>
+    <button class="iconbtn" id="fsBtn" title="volledig scherm">⛶</button>
   </div>
-</div>
+
+  <div class="wrap">
+    <div class="panel">
+      <div class="frame">
+        <div class="stage">
+          <img id="diceImg" class="hidden" alt=""/>
+          <div class="mask" id="mask"></div>
+          <div class="feedback" id="feedback">
+            <div class="fbInner">
+              <div class="emoji" id="emoji"></div>
+              <div class="bign" id="bign"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pad" id="pad" aria-label="antwoorden"></div>
+    </div>
+  </div>
 
 <script>
 const RAW_ITEMS = [{"src": "assets/images/dobbelsteen01a.png", "total": 1, "nDice": 1, "d1": 1, "d2": null, "name": "dobbelsteen01a.png"}, {"src": "assets/images/dobbelsteen02a.png", "total": 2, "nDice": 1, "d1": 2, "d2": null, "name": "dobbelsteen02a.png"}, {"src": "assets/images/dobbelsteen02b.png", "total": 2, "nDice": 2, "d1": 1, "d2": 1, "name": "dobbelsteen02b.png"}, {"src": "assets/images/dobbelsteen03a.png", "total": 3, "nDice": 1, "d1": 3, "d2": null, "name": "dobbelsteen03a.png"}, {"src": "assets/images/dobbelsteen03b.png", "total": 3, "nDice": 2, "d1": 1, "d2": 2, "name": "dobbelsteen03b.png"}, {"src": "assets/images/dobbelsteen03c.png", "total": 3, "nDice": 2, "d1": 2, "d2": 1, "name": "dobbelsteen03c.png"}, {"src": "assets/images/dobbelsteen04a.png", "total": 4, "nDice": 1, "d1": 4, "d2": null, "name": "dobbelsteen04a.png"}, {"src": "assets/images/dobbelsteen04b.png", "total": 4, "nDice": 2, "d1": 1, "d2": 3, "name": "dobbelsteen04b.png"}, {"src": "assets/images/dobbelsteen04c.png", "total": 4, "nDice": 2, "d1": 2, "d2": 2, "name": "dobbelsteen04c.png"}, {"src": "assets/images/dobbelsteen04d.png", "total": 4, "nDice": 2, "d1": 3, "d2": 1, "name": "dobbelsteen04d.png"}, {"src": "assets/images/dobbelsteen05a.png", "total": 5, "nDice": 1, "d1": 5, "d2": null, "name": "dobbelsteen05a.png"}, {"src": "assets/images/dobbelsteen05b.png", "total": 5, "nDice": 2, "d1": 1, "d2": 4, "name": "dobbelsteen05b.png"}, {"src": "assets/images/dobbelsteen05c.png", "total": 5, "nDice": 2, "d1": 2, "d2": 3, "name": "dobbelsteen05c.png"}, {"src": "assets/images/dobbelsteen05d.png", "total": 5, "nDice": 2, "d1": 3, "d2": 2, "name": "dobbelsteen05d.png"}, {"src": "assets/images/dobbelsteen05e.png", "total": 5, "nDice": 2, "d1": 4, "d2": 1, "name": "dobbelsteen05e.png"}, {"src": "assets/images/dobbelsteen06a.png", "total": 6, "nDice": 1, "d1": 6, "d2": null, "name": "dobbelsteen06a.png"}, {"src": "assets/images/dobbelsteen06b.png", "total": 6, "nDice": 2, "d1": 1, "d2": 5, "name": "dobbelsteen06b.png"}, {"src": "assets/images/dobbelsteen06c.png", "total": 6, "nDice": 2, "d1": 2, "d2": 4, "name": "dobbelsteen06c.png"}, {"src": "assets/images/dobbelsteen06d.png", "total": 6, "nDice": 2, "d1": 3, "d2": 3, "name": "dobbelsteen06d.png"}, {"src": "assets/images/dobbelsteen06e.png", "total": 6, "nDice": 2, "d1": 4, "d2": 2, "name": "dobbelsteen06e.png"}, {"src": "assets/images/dobbelsteen06f.png", "total": 6, "nDice": 2, "d1": 5, "d2": 1, "name": "dobbelsteen06f.png"}, {"src": "assets/images/dobbelsteen07a.png", "total": 7, "nDice": 2, "d1": 1, "d2": 6, "name": "dobbelsteen07a.png"}, {"src": "assets/images/dobbelsteen07b.png", "total": 7, "nDice": 2, "d1": 2, "d2": 5, "name": "dobbelsteen07b.png"}, {"src": "assets/images/dobbelsteen07c.png", "total": 7, "nDice": 2, "d1": 5, "d2": 2, "name": "dobbelsteen07c.png"}, {"src": "assets/images/dobbelsteen07d.png", "total": 7, "nDice": 2, "d1": 6, "d2": 1, "name": "dobbelsteen07d.png"}, {"src": "assets/images/dobbelsteen08a.png", "total": 8, "nDice": 2, "d1": 2, "d2": 6, "name": "dobbelsteen08a.png"}, {"src": "assets/images/dobbelsteen08b.png", "total": 8, "nDice": 2, "d1": 4, "d2": 4, "name": "dobbelsteen08b.png"}, {"src": "assets/images/dobbelsteen08c.png", "total": 8, "nDice": 2, "d1": 6, "d2": 2, "name": "dobbelsteen08c.png"}, {"src": "assets/images/dobbelsteen09a.png", "total": 9, "nDice": 2, "d1": 4, "d2": 5, "name": "dobbelsteen09a.png"}, {"src": "assets/images/dobbelsteen09b.png", "total": 9, "nDice": 2, "d1": 5, "d2": 4, "name": "dobbelsteen09b.png"}, {"src": "assets/images/dobbelsteen10.png", "total": 10, "nDice": 2, "d1": 5, "d2": 5, "name": "dobbelsteen10.png"}];
 
 const $ = (id) => document.getElementById(id);
+
+const topbar = $("topbar");
 const minTotal = $("minTotal");
 const maxTotal = $("maxTotal");
+const diceCountGroup = $("diceCountGroup");
+const typeGroup = $("typeGroup");
+const relGroup = $("relGroup");
 const flashMs = $("flashMs");
 const flashLabel = $("flashLabel");
 const startBtn = $("startBtn");
-const revealBtn = $("revealBtn");
 const fsBtn = $("fsBtn");
 
 const diceImg = $("diceImg");
@@ -331,9 +346,6 @@ const pad = $("pad");
 const feedback = $("feedback");
 const emoji = $("emoji");
 const bign = $("bign");
-
-const filterGroup = $("filterGroup");
-const diceCountGroup = $("diceCountGroup");
 
 let ALL_ITEMS = [];
 let current = null;
@@ -357,10 +369,9 @@ function shuffle(arr) {
   return arr;
 }
 
-function getActiveFilters() {
-  const set = new Set();
-  filterGroup.querySelectorAll(".tbtn.active").forEach(b => set.add(b.dataset.f));
-  return set;
+function syncTopbarHeight() {
+  const h = topbar.offsetHeight || 72;
+  document.documentElement.style.setProperty("--topbar-h", h + "px");
 }
 
 function getDiceCount() {
@@ -373,59 +384,98 @@ function getDiceCount() {
   return on;
 }
 
-function matchesAnyFilter(item, fset) {
-  if (fset.size === 0) return true;
-  if (item.nDice !== 2) return false;
-  const a = item.d1;
-  const b = item.d2;
-  const rules = {
-    // +1: er zit een 1 in (een of beide dobbelstenen)
-    diff1: (a === 1 || b === 1),
-    // +2: er zit een 2 in (een of beide dobbelstenen)
-    diff2: (a === 2 || b === 2),
-    equal: a === b,
-    first: a > b,
-    second: b > a
-  };
-  for (const f of fset) {
-    if (rules[f]) return true;
+function getTypes() {
+  const set = new Set();
+  typeGroup.querySelectorAll(".tbtn.active").forEach(b => set.add(b.dataset.t));
+  return set;
+}
+
+function getRels() {
+  const set = new Set();
+  relGroup.querySelectorAll(".tbtn.active").forEach(b => set.add(b.dataset.r));
+  return set;
+}
+
+function relOk(it, rels) {
+  if (rels.size === 0) return true;
+  const a = it.d1, b = it.d2;
+  return (rels.has("equal") && a === b) ||
+         (rels.has("first") && a > b) ||
+         (rels.has("second") && b > a);
+}
+
+function matchContainsNumberOnSmallerSide(it, n, rels) {
+  const a = it.d1, b = it.d2;
+  if (rels.size === 0) return (a === n || b === n);
+
+  let ok = false;
+  if (rels.has("equal") && a === b && a === n) ok = true;
+  if (rels.has("first") && a > b && b === n) ok = true;   // tweede is kleiner
+  if (rels.has("second") && b > a && a === n) ok = true;  // eerste is kleiner
+  return ok;
+}
+
+function typeOk(it, types, rels) {
+  if (types.size === 0) return true;
+  for (const t of types) {
+    if (t === "diff1" && matchContainsNumberOnSmallerSide(it, 1, rels)) return true;
+    if (t === "diff2" && matchContainsNumberOnSmallerSide(it, 2, rels)) return true;
   }
   return false;
+}
+
+function itemEligible(it, minT, maxT, diceOn, types, rels) {
+  if (it.total < minT || it.total > maxT) return false;
+
+  // als er mix of vergelijken aan staat, dan alleen 2 dobbelstenen
+  if ((types.size > 0 || rels.size > 0) && it.nDice !== 2) return false;
+
+  if (!diceOn.has(it.nDice)) return false;
+  if (!relOk(it, rels)) return false;
+  if (!typeOk(it, types, rels)) return false;
+
+  return true;
 }
 
 function settingsKey() {
   const minT = clamp(parseInt(minTotal.value || "0", 10), 0, 20);
   const maxT = clamp(parseInt(maxTotal.value || "10", 10), 0, 20);
-  const f = Array.from(getActiveFilters()).sort().join(",");
-  const d = Array.from(getDiceCount()).sort().join(",");
-  return `${minT}|${maxT}|${f}|${d}|${ALL_ITEMS.length}`;
+  const diceOn = Array.from(getDiceCount()).sort().join("");
+  const types = Array.from(getTypes()).sort().join(",");
+  const rels = Array.from(getRels()).sort().join(",");
+  const ms = flashMs.value;
+  return [minT, maxT, diceOn, types, rels, ms].join("|");
 }
 
 function buildBuckets() {
   const minT = clamp(parseInt(minTotal.value || "0", 10), 0, 20);
   const maxT = clamp(parseInt(maxTotal.value || "10", 10), 0, 20);
-  if (minT > maxT) {
-    minTotal.value = String(maxT);
+  if (minT > maxT) minTotal.value = String(maxT);
+
+  const diceOn = getDiceCount();
+  const types = getTypes();
+  const rels = getRels();
+
+  // als er mix of vergelijken aan staat, zet 2 aan (zodat je niet per ongeluk leeg speelt)
+  if ((types.size > 0 || rels.size > 0) && !diceOn.has(2)) {
+    const b2 = diceCountGroup.querySelector('[data-c="2"]');
+    if (b2) b2.classList.add("active");
+    diceOn.add(2);
   }
 
-  const fset = getActiveFilters();
-  const diceOn = getDiceCount();
-
   const temp = new Map();
-
   for (const it of ALL_ITEMS) {
-    if (it.total < minT || it.total > maxT) continue;
-    if (!diceOn.has(it.nDice)) continue;
-    if (!matchesAnyFilter(it, fset)) continue;
+    if (!itemEligible(it, minT, maxT, diceOn, types, rels)) continue;
     const k = it.total;
     if (!temp.has(k)) temp.set(k, []);
     temp.get(k).push(it);
   }
 
+  // geen items, dan maak de selectie wat ruimer, maar blijf bij 2 dobbelstenen als dat logisch is
   if (temp.size === 0) {
-    // eerste fallback, filters loslaten
     for (const it of ALL_ITEMS) {
       if (it.total < minT || it.total > maxT) continue;
+      if ((types.size > 0 || rels.size > 0) && it.nDice !== 2) continue;
       if (!diceOn.has(it.nDice)) continue;
       const k = it.total;
       if (!temp.has(k)) temp.set(k, []);
@@ -433,17 +483,7 @@ function buildBuckets() {
     }
   }
 
-  if (temp.size === 0) {
-    // laatste fallback, alles
-    for (const it of ALL_ITEMS) {
-      const k = it.total;
-      if (!temp.has(k)) temp.set(k, []);
-      temp.get(k).push(it);
-    }
-  }
-
   buckets = temp;
-
   const totals = Array.from(buckets.keys()).sort((a,b)=>a-b);
   bag = shuffle(totals.slice());
 }
@@ -454,9 +494,7 @@ function pickNextItem() {
     lastKey = key;
     buildBuckets();
   }
-
   if (bag.length === 0) buildBuckets();
-
   let total = bag.pop();
   if (!buckets.has(total) || buckets.get(total).length === 0) {
     buildBuckets();
@@ -465,17 +503,48 @@ function pickNextItem() {
 
   const list = buckets.get(total) || [];
   const fresh = list.filter(it => !recent.includes(it.src));
-  const pool = (fresh.length > 0) ? fresh : list;
-
+  const pool = fresh.length ? fresh : list;
   const chosen = pool[Math.floor(Math.random() * pool.length)];
   return chosen;
 }
 
-function setPadEnabled(enabled) {
-  pad.querySelectorAll("button").forEach(btn => {
-    btn.classList.toggle("disabled", !enabled);
-    btn.disabled = !enabled;
-  });
+function wait(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+function showDice(item) {
+  diceImg.src = item.src;
+  diceImg.classList.remove("hidden");
+  mask.classList.add("off");
+}
+
+function hideDice() {
+  mask.classList.remove("off");     // zwart vlak aan
+  diceImg.classList.add("hidden");  // zekerheid, ook bij traag laden
+}
+
+function hideFeedback() {
+  feedback.classList.remove("on");
+  emoji.textContent = "";
+  bign.textContent = "";
+}
+
+function showFeedback(ok, correctTotal) {
+  emoji.textContent = ok ? "🎉" : "😅";
+  bign.textContent = ok ? String(correctTotal) : "";
+  feedback.classList.add("on");
+}
+
+function buildPad() {
+  pad.innerHTML = "";
+  for (let i = 1; i <= 10; i++) {
+    const b = document.createElement("button");
+    b.className = "nbtn";
+    b.textContent = String(i);
+    b.dataset.n = String(i);
+    b.addEventListener("click", () => handleAnswer(i));
+    pad.appendChild(b);
+  }
 }
 
 function updatePadAvailability() {
@@ -484,180 +553,109 @@ function updatePadAvailability() {
   pad.querySelectorAll("button").forEach(btn => {
     const n = Number(btn.dataset.n);
     const inRange = (n >= minT && n <= maxT);
-    btn.classList.toggle("disabled", !inRange || !awaiting);
-    btn.disabled = !inRange || !awaiting;
+    const enabled = inRange && awaiting;
+    btn.classList.toggle("disabled", !enabled);
+    btn.disabled = !enabled;
   });
 }
 
-function showFeedback(ok, correctTotal) {
-  emoji.textContent = ok ? "🎉" : "😅";
-  bign.textContent = ok ? String(correctTotal) : "";
-  feedback.classList.add("visible");
-}
-
-function hideFeedback() {
-  feedback.classList.remove("visible");
-}
-
-function showDice() {
-  diceImg.classList.remove("hidden");
-  mask.classList.remove("visible");
-}
-
-function hideDice() {
-  diceImg.classList.add("hidden");
-  mask.classList.add("visible");
-}
-
-function sleep(ms) {
-  return new Promise(res => setTimeout(res, ms));
-}
-
 async function flashItem(item) {
-  current = item;
-  awaiting = false;
-  attempt = 0;
-  updatePadAvailability();
-
-  diceImg.src = item.src;
-  showDice();
-
-  const ms = clamp(parseInt(flashMs.value || "800", 10), 150, 2500);
-  await sleep(ms);
-
-  hideDice();
-  awaiting = true;
-  updatePadAvailability();
-}
-
-async function reflashSame() {
-  if (!current) return;
   awaiting = false;
   updatePadAvailability();
-  showDice();
-  const ms = clamp(parseInt(flashMs.value || "800", 10), 150, 2500);
-  await sleep(ms);
+  hideFeedback();
+
+  showDice(item);
+  await wait(Number(flashMs.value));
   hideDice();
+
   awaiting = true;
   updatePadAvailability();
 }
 
 async function nextRound() {
   if (!running) return;
-
-  const item = pickNextItem();
-  if (!item) return;
-
-  recent.unshift(item.src);
-  if (recent.length > 8) recent.pop();
-
-  await flashItem(item);
+  current = pickNextItem();
+  attempt = 0;
+  recent.push(current.src);
+  if (recent.length > 8) recent.shift();
+  await flashItem(current);
 }
 
-async function onAnswer(n) {
-  if (!awaiting || !current) return;
+async function replaySame() {
+  if (!running || !current) return;
+  attempt += 1;
+  await flashItem(current);
+}
 
+async function handleAnswer(n) {
+  if (!running || !awaiting || !current) return;
   awaiting = false;
   updatePadAvailability();
 
   const ok = (n === current.total);
+  showFeedback(ok, current.total);
+
   if (ok) {
-    showFeedback(true, current.total);
-    await sleep(850);
+    await wait(900);
     hideFeedback();
-    await sleep(120);
+    await wait(120);
     await nextRound();
-    return;
-  }
-
-  attempt += 1;
-  showFeedback(false, current.total);
-  await sleep(650);
-  hideFeedback();
-  await sleep(120);
-  await reflashSame();
-}
-
-function buildPad() {
-  pad.innerHTML = "";
-  for (let n = 1; n <= 10; n++) {
-    const b = document.createElement("button");
-    b.className = "num";
-    b.textContent = String(n);
-    b.dataset.n = String(n);
-    b.addEventListener("click", () => onAnswer(n));
-    pad.appendChild(b);
+  } else {
+    await wait(650);
+    hideFeedback();
+    await wait(120);
+    await replaySame();
   }
 }
 
-async function validateAssets(items) {
-  const ok = [];
-  await Promise.all(items.map(it => new Promise(resolve => {
-    const im = new Image();
-    im.onload = () => { ok.push(it); resolve(); };
-    im.onerror = () => resolve();
-    im.src = it.src;
-  })));
-  return ok;
-}
-
-function wireToggles() {
-  function toggle(btn) {
-    btn.classList.toggle("active");
-    lastKey = "";
-    if (running && current) {
-      // nieuwe instellingen, volgende ronde past zich aan
-    }
-  }
-
-  filterGroup.querySelectorAll(".tbtn").forEach(b => {
-    b.addEventListener("click", () => toggle(b));
-  });
-
-  diceCountGroup.querySelectorAll(".tbtn").forEach(b => {
-    b.addEventListener("click", () => {
-      toggle(b);
-      getDiceCount();
+function wireToggleGroup(el) {
+  el.querySelectorAll(".tbtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      btn.classList.toggle("active");
+      lastKey = "";
+      updatePadAvailability();
     });
   });
 }
 
-flashMs.addEventListener("input", () => {
-  flashLabel.textContent = String(flashMs.value);
-});
+function wireControls() {
+  wireToggleGroup(diceCountGroup);
+  wireToggleGroup(typeGroup);
+  wireToggleGroup(relGroup);
 
-function setStartReady(ready) {
-  startBtn.classList.toggle("disabled", !ready);
-}
+  [minTotal, maxTotal].forEach(inp => inp.addEventListener("input", () => {
+    lastKey = "";
+    updatePadAvailability();
+  }));
 
-startBtn.addEventListener("click", async () => {
-  if (!ALL_ITEMS.length) return;
-  running = true;
-  hideFeedback();
-  hideDice();
-  await sleep(80);
-  await nextRound();
-});
+  flashMs.addEventListener("input", () => {
+    flashLabel.textContent = String(flashMs.value);
+    lastKey = "";
+  });
 
-revealBtn.addEventListener("click", async () => {
-  if (!running || !current) return;
-  await reflashSame();
-});
-
-fsBtn.addEventListener("click", async () => {
-  try {
-    if (!document.fullscreenElement) {
-      await document.documentElement.requestFullscreen();
-    } else {
-      await document.exitFullscreen();
+  startBtn.addEventListener("click", async () => {
+    running = !running;
+    startBtn.textContent = running ? "⏸" : "▶";
+    hideFeedback();
+    hideDice();
+    awaiting = false;
+    updatePadAvailability();
+    if (running) {
+      await wait(120);
+      await nextRound();
     }
-  } catch (e) {}
-});
+  });
 
-[minTotal, maxTotal].forEach(inp => inp.addEventListener("input", () => {
-  lastKey = "";
-  if (running) updatePadAvailability();
-}));
+  fsBtn.addEventListener("click", async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (e) {}
+  });
+}
 
 diceImg.addEventListener("error", () => {
   if (!current) return;
@@ -666,17 +664,56 @@ diceImg.addEventListener("error", () => {
   if (running) nextRound();
 });
 
+
+async function validateAssets(items) {
+  const ok = [];
+  const limit = 4;
+  let idx = 0;
+
+  async function tryOne(it) {
+    return await new Promise(resolve => {
+      const im = new Image();
+      let done = false;
+      const finish = (v) => { if (done) return; done = true; resolve(v); };
+      im.onload = () => finish(true);
+      im.onerror = () => finish(false);
+      im.src = it.src;
+      // kleine failsafe, geen eindeloze hang
+      setTimeout(() => finish(false), 3500);
+    });
+  }
+
+  async function worker() {
+    while (idx < items.length) {
+      const i = idx++;
+      const it = items[i];
+      const ok1 = await tryOne(it);
+      if (ok1) ok.push(it);
+    }
+  }
+
+  await Promise.all(Array.from({length: limit}, () => worker()));
+  return ok;
+}
+
+
 (async function init() {
   buildPad();
-  wireToggles();
+  wireControls();
+
   flashLabel.textContent = String(flashMs.value);
   hideDice();
-  setStartReady(false);
+  hideFeedback();
 
-  // voor GitHub Pages, skip ontbrekende plaatjes voordat je start
+  syncTopbarHeight();
+  try {
+    new ResizeObserver(syncTopbarHeight).observe(topbar);
+  } catch (e) {
+    window.addEventListener("resize", syncTopbarHeight);
+  }
+
   ALL_ITEMS = await validateAssets(RAW_ITEMS);
 
-  setStartReady(ALL_ITEMS.length > 0);
   lastKey = "";
   updatePadAvailability();
 })();
